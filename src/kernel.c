@@ -12,7 +12,7 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags)
 {
     hal_io_video_init();
     hal_io_serial_init();
-    sdInitCard (NULL, NULL, true);
+    sdInitCard(NULL, NULL, true);
 
     printf("Hello, World!\n");
 }
