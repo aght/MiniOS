@@ -16,6 +16,5 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags)
     sdInitCard(NULL, NULL, true);
     console_init();
 
-    console_println("Hello World!");
-    console_println("FUCK!");
+    console_run();
 }

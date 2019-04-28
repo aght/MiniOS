@@ -95,6 +95,7 @@ void hal_io_video_putc(uint8_t c)
 				}
 			}
 		}
+		
 		cursorX += FONT_WIDTH;
 	}
 	}

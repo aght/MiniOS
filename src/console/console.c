@@ -10,6 +10,27 @@ int console_init()
 {
 }
 
+void console_run()
+{
+    while (1)
+    {
+        char input = hal_io_serial_getc();
+
+        switch (input)
+        {
+        case '\n':
+        case '\r':
+            console_newline();
+            break;
+        case '\b':
+            console_print("\b \b");
+            break;
+        default:
+            console_print("%c", input);
+        }
+    }
+}
+
 int vconsole_print(const char *fmt, va_list args)
 {
     char printf_buf[512];
@@ -48,6 +69,11 @@ int console_println(const char *fmt, ...)
     va_end(args);
 
     return printed + console_print("%c", '\n');
+}
+
+int console_newline()
+{
+    return console_print("%c", '\n');
 }
 
 #endif
