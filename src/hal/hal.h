@@ -10,11 +10,10 @@
 #define FONT_HEIGHT 16
 #define FONT_WIDTH 8
 
-typedef struct
-{
-  uint8_t r;
-  uint8_t g;
-  uint8_t b;
+typedef struct {
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
 } rgb_t;
 
 uint32_t hal_io_get_cursor_x();
