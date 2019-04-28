@@ -8,8 +8,8 @@
 
 static int vconsole_print(const char *, va_list);
 static void prompt();
-static bool run_command(char *buf);
-static void input_parse(const char *input, char *buffer[], int *n);
+static void run_command(char *buf);
+static void input_parse(char *input, char *buffer[], int *n);
 
 static rgb_t text_color = {255, 255, 255};
 static rgb_t fill_color = {0, 0, 0};
@@ -20,7 +20,7 @@ static char cwd[4096];
 void console_init() {
     hal_io_video_set_brush_color(text_color);
     hal_io_video_set_fill_color(fill_color);
-    chdir("/");
+    chdir(NULL);
     prompt();
 }
 
@@ -47,27 +47,39 @@ void console_run() {
     }
 }
 
-const char *getcwd() {
-    return cwd;
+void getcwd(char buf[]) {
+    sprintf(buf, cwd);
 }
 
 void chdir(const char *dir) {
-    sprintf(cwd, dir);
+    if (!dir) {
+        strcpy(cwd, "/");
+        return;
+    }
+
+    char resolved_path[4096];
+    realpath_n(dir, resolved_path);
 }
 
 static void prompt() {
     console_print("%s@%s:%s$ ", USERNAME, HOSTNAME, cwd);
 }
 
-static bool run_command(char *buf) {
+static void run_command(char *buf) {
+    if (!*buf) {
+        return;
+    }
+
     char *tokens[256];
     int n;
+
     input_parse(buf, tokens, &n);
 
     command_t *cmd = find_command(tokens[0]);
 
     if (!cmd) {
         console_println("%s: command not found", tokens[0]);
+        return;
     }
 
     if (n > 1) {
@@ -75,13 +87,9 @@ static bool run_command(char *buf) {
     } else {
         cmd->action(NULL, n - 1);
     }
-
-    console_newline();
-
-    return true;
 }
 
-static void input_parse(const char *input, char *buffer[], int *n) {
+static void input_parse(char *input, char *buffer[], int *n) {
     int i = 0;
 
     char *token = strtok(input, " ");

@@ -7,12 +7,13 @@
 
 #include "../drivers/stdio/emb-stdio.h"
 #include "../hal/hal.h"
+#include "../coreutils/coreutils.h"
 #include "command.h"
 
 void console_init();
 void console_run();
 
-const char *getcwd();
+void getcwd(char buf[]);
 void chdir(const char *dir);
 
 int console_print(const char *fmt, ...);

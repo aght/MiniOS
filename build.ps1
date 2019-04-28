@@ -23,6 +23,8 @@ Write-Host "Building..."
 	src/uart/uart.c `
 	src/console/console.c `
 	src/console/command.c `
+	src/coreutils/realpath.c `
+	src/vector/vector.c `
   -o build/kernel.elf `
 	-O0	`
 	-lc -lm -lg -lgcc
