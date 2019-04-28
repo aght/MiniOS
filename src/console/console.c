@@ -2,12 +2,24 @@
 #define _CONSOLE_
 
 #include "console.h"
-#include "../hal/hal.h"
 
-int vconsole_print(const char *fmt, va_list args);
+#define USERNAME "andy"
+#define HOSTNAME "localhost"
 
-int console_init()
+static int vconsole_print(const char *fmt, va_list args);
+static void prompt();
+
+static rgb_t text_color = {255, 255, 255};
+static rgb_t fill_color = {0, 0, 0};
+
+static char cwd[4096];
+
+void console_init()
 {
+    hal_io_video_set_brush_color(text_color);
+    hal_io_video_set_fill_color(fill_color);
+    cd("/");
+    prompt();
 }
 
 void console_run()
@@ -21,17 +33,28 @@ void console_run()
         case '\n':
         case '\r':
             console_newline();
+            prompt();
             break;
         case '\b':
             console_print("\b \b");
             break;
         default:
+        {
             console_print("%c", input);
+        }
         }
     }
 }
 
-int vconsole_print(const char *fmt, va_list args)
+void cd(const char* dir) {
+    sprintf(cwd, dir);
+}
+
+static void prompt() {
+    console_print("%s@%s:%s$ ", USERNAME, HOSTNAME, cwd);
+}
+
+static int vconsole_print(const char *fmt, va_list args)
 {
     char printf_buf[512];
     int printed = 0;

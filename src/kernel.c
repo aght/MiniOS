@@ -9,7 +9,7 @@
 #include "hal/hal.h"
 #include "console/console.h"
 
-void main(uint32_t r0, uint32_t r1, uint32_t atags)
+void main(void)
 {
     hal_io_video_init();
     hal_io_serial_init();

@@ -12,6 +12,22 @@ static uint32_t cursorY = 0;
 static rgb_t brush_color = {255, 255, 255};
 static rgb_t fill_color = {0, 0, 0};
 
+uint32_t hal_io_get_cursor_x() {
+	return cursorX;
+}
+
+uint32_t hal_io_get_cursor_y() {
+	return cursorY;
+}
+
+uint32_t hal_io_set_cursor_x(uint32_t x) {
+	cursorX = x;
+}
+
+uint32_t hal_io_set_cursor_y(uint32_t y) {
+	cursorY = y;
+}
+
 void hal_io_serial_init(void)
 {
 	uart0_init();
@@ -35,19 +51,21 @@ uint8_t hal_io_serial_getc()
 	return uart0_getc();
 }
 
-void hal_io_video_brush_color(rgb_t color) {
+void hal_io_video_set_brush_color(rgb_t color)
+{
 	brush_color = color;
 }
 
-void hal_io_video_fill_color(rgb_t color) {
+void hal_io_video_set_fill_color(rgb_t color)
+{
 	fill_color = color;
 }
 
-void hal_io_video_puts(uint8_t *string)
+void hal_io_video_puts(uint8_t *str)
 {
-	while (*string)
+	while (*str)
 	{
-		hal_io_video_putc(*string++);
+		hal_io_video_putc(*str++);
 	}
 }
 
@@ -84,7 +102,9 @@ void hal_io_video_putc(uint8_t c)
 				if ((bits & 0x80000000) != 0)
 				{
 					hal_io_video_put_pixel(cursorX + xoffs, y, brush_color);
-				} else {
+				}
+				else
+				{
 					hal_io_video_put_pixel(cursorX + xoffs, y, fill_color);
 				}
 
@@ -95,7 +115,7 @@ void hal_io_video_putc(uint8_t c)
 				}
 			}
 		}
-		
+
 		cursorX += FONT_WIDTH;
 	}
 	}
