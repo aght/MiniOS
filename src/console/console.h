@@ -3,20 +3,17 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "../hal/hal.h"
-
 #include "../drivers/stdio/emb-stdio.h"
-
-typedef struct {
-    const char* command;
-    bool (*action)(char);
-} command_t;
+#include "command.h"
 
 void console_init();
 void console_run();
 
-void cd(const char* dir);
+const char* get_cwd();
+void change_directory(const char* dir);
 
 int console_print(const char *fmt, ...);
 int console_println(const char *fmt, ...);
