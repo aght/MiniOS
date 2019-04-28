@@ -21,6 +21,7 @@ Write-Host "Building..."
 	src/hal/hal.c `
 	src/kernel.c `
 	src/uart/uart.c `
+	src/console/console.c `
   -o build/kernel.elf `
 	-O0	`
 	-lc -lm -lg -lgcc
@@ -30,6 +31,5 @@ Write-Host "Building..."
 
 if ( $exec -eq "exec=true" )
 {
-	Clear-Host;
   & qemu-system-arm.exe -m 256 -M raspi2 -serial stdio -kernel build/kernel.elf -drive file=sdcard/sdcard.img,if=sd,format=raw
 }

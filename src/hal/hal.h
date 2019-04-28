@@ -1,16 +1,11 @@
-/*
-*  HAL Header File
-*
-*	 Rafael Roman Otero
-*/
-
 #ifndef HAL_H
 #define HAL_H
 
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef struct {
+typedef struct
+{
   uint8_t r;
   uint8_t g;
   uint8_t b;
@@ -23,8 +18,8 @@ typedef struct {
 #define FONT_WIDTH 8
 
 uint32_t hal_io_video_init(void);
-void hal_io_video_puts(uint8_t *, rgb_t);
-void hal_io_video_putc(uint8_t, rgb_t);
+void hal_io_video_puts(uint8_t *);
+void hal_io_video_putc(uint8_t);
 void hal_io_video_put_pixel(uint32_t, uint32_t, rgb_t);
 
 void hal_io_serial_init(void);
