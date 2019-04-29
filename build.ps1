@@ -6,6 +6,7 @@ $ErrorActionPreference = "Stop"
 Write-Host "Building..."
 
 & arm-none-eabi-gcc.exe `
+	-w `
 	-mcpu=cortex-a7 `
 	-fpic `
 	-ffreestanding `

@@ -8,16 +8,17 @@
 
 static int vconsole_print(const char *, va_list);
 static void prompt();
-static void run_command(char *buf);
-static void input_parse(char *input, char *buffer[], int *n);
+static void run_command(vector* buffer);
+static void input_parse(vector *input, char *buffer[], int *n);
 
 static rgb_t text_color = {255, 255, 255};
 static rgb_t fill_color = {0, 0, 0};
 
-static char input_buffer[SCREEN_WIDTH / FONT_WIDTH];
+static vector input_buffer;
 static char cwd[4096];
 
 void console_init() {
+    vector_init(&input_buffer);
     hal_io_video_set_brush_color(text_color);
     hal_io_video_set_fill_color(fill_color);
     chdir(NULL);
@@ -32,16 +33,17 @@ void console_run() {
             case '\n':
             case '\r':
                 console_newline();
-                run_command(input_buffer);
+                run_command(&input_buffer);
                 prompt();
-                memset(input_buffer, 0, sizeof(input_buffer));
+                vector_clear(&input_buffer);
                 break;
             case '\b':
                 console_print("\b \b");
+                vector_remove(&input_buffer, input_buffer.size - 1);
                 break;
             default: {
                 console_print("%c", input);
-                sprintf(input_buffer, "%s%c", input_buffer, input);
+                vector_add(&input_buffer, input);
             }
         }
     }
@@ -65,15 +67,11 @@ static void prompt() {
     console_print("%s@%s:%s$ ", USERNAME, HOSTNAME, cwd);
 }
 
-static void run_command(char *buf) {
-    if (!*buf) {
-        return;
-    }
-
+static void run_command(vector *buffer) {
     char *tokens[256];
     int n;
 
-    input_parse(buf, tokens, &n);
+    input_parse(buffer, tokens, &n);
 
     command_t *cmd = find_command(tokens[0]);
 
@@ -89,17 +87,25 @@ static void run_command(char *buf) {
     }
 }
 
-static void input_parse(char *input, char *buffer[], int *n) {
-    int i = 0;
+static void input_parse(vector *input, char *buffer[], int *n) {
+    char str[input->size + 1];
 
-    char *token = strtok(input, " ");
-    buffer[i++] = token;
+    int i;
+    for (i = 0; i < input->size + 1; i++) {
+        str[i] = vector_get(input, i);
+    }
+    str[i] = '\0';
+
+    int j = 0;
+
+    char *token = strtok(str, " ");
+    buffer[j++] = token;
     while (token) {
         token = strtok(NULL, " ");
-        buffer[i++] = token;
+        buffer[j++] = token;
     }
 
-    *n = --i;
+    *n = --j;
 }
 
 static int vconsole_print(const char *fmt, va_list args) {

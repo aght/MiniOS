@@ -3,9 +3,9 @@
 
 #include "coreutils.h"
 
-static void mark_tokens(vector *v, char token) {
+static void mark_tokens(vector *v, char delim) {
     for (int i = 0; i < v->size; i++) {
-        if (vector_get(v, i) == token) {
+        if (vector_get(v, i) == delim) {
             vector_set(v, i, '\0');
         }
     }
