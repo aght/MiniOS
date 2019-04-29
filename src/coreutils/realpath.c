@@ -69,17 +69,25 @@ static int vstrrcc(vector *str, char c) {
     return n;
 }
 
+// add param to see how many tokens are left
 static void resolve_symbols(vector tokens[], int n) {
     for (int i = 0; i < n; i++) {
         int c = vstrrcc(&tokens[i], '.');
 
         if (c == 2) {
+            if (i != 0) {
+                vector_destroy(&tokens[i]);
+                // memcpy()
+
+            }
+        } else if (c == 1) {
+            
         }
 
-        for (int j = 0; j < tokens[i].size; j++) {
-            console_print("%c", vector_get(&tokens[i], j));
-        }
-        console_println(": %d", vstrrcc(&tokens[i], '.'));
+        // for (int j = 0; j < tokens[i].size; j++) {
+        //     console_print("%c", vector_get(&tokens[i], j));
+        // }
+        // console_println(": %d", vstrrcc(&tokens[i], '.'));
     }
 }
 
