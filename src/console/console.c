@@ -8,7 +8,7 @@
 
 static int vconsole_print(const char *, va_list);
 static void prompt();
-static void run_command(vector* buffer);
+static void run_command(vector *buffer);
 static void input_parse(vector *input, char *buffer[], int *n);
 
 static rgb_t text_color = {255, 255, 255};
