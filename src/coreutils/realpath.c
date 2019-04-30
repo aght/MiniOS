@@ -11,10 +11,8 @@ static void mark_delims(vector *v, char delim) {
     }
 }
 
-static void tokenize(vector *v, char token, vector *tokens[], int *n) {
+static void tokenize(vector *v, char token, vector *tokens) {
     mark_delims(v, token);
-
-    *n = 0;
 
     int j = -1;
     int k = 0;
@@ -41,12 +39,14 @@ static void tokenize(vector *v, char token, vector *tokens[], int *n) {
             continue;
         }
 
-        vector_init(tokens[*n]);
+        vector *str = (vector *)malloc(sizeof(vector));
+        vector_init(str);
+
         for (int z = j + 1; z < k; z++) {
-            vector_add(tokens[*n], vector_get(v, z));
+            vector_add(str, vector_get(v, z));
         }
 
-        (*n)++;
+        vector_add(tokens, str);
 
         j = k;
         i = k;
@@ -67,34 +67,31 @@ static int vstrrcc(vector *str, char c) {
     return n;
 }
 
-// Error: cd /d./.d./.d/d/d
-static int resolve_symbols(vector *tokens[], int n) {
-    int j = n;
+static int resolve_symbols(vector *tokens) {
+    int j = tokens->size;
 
     for (int i = 0; i < j; i++) {
-        int c = vstrrcc(tokens[i], '.');
+        vector *str = vector_get(tokens, i);
+        int c = vstrrcc(str, '.');
 
-        if ((c == 2 && tokens[i]->size > 2) || (c == 1 && tokens[i]->size > 1)) {
-            for (int k = n; k >= i + 2; k--) {
-                tokens[k] = tokens[k - 1];
-            }
+        if ((c == 2 && str->size > 2) || (c == 1 && str->size > 1)) {
+            vector *a = (vector *)malloc(sizeof(vector));
+            vector *b = vector_get(tokens, i);
 
-            tokens[i + 1] = (vector *)malloc(sizeof(vector));
-            vector_init(tokens[i + 1]);
+            vector_init(a);
 
             for (int k = 0; k < c; k++) {
-                vector_add(tokens[i + 1], '.');
-                vector_remove(tokens[i], vector_rfind(tokens[i], '.'));
+                vector_add(a, '.');
+                vector_remove(b, vector_rfind(b, '.'));
             }
+
+            vector_insert(tokens, i + 1, a);
 
             i++;
             j++;
-        } 
-
-        console_println("%d", i);
+        }
     }
 
-    console_println("Return: %d", j);
     return j;
 }
 
@@ -107,29 +104,22 @@ char *realpath_n(const char *path, const char *resolved_path) {
         vector_add(&m_str, path[i]);
     }
 
-    vector *tokens[256];
+    vector tokens;
+    vector_init(&tokens);
 
-    for (int i = 0; i < 256; i++) {
-        tokens[i] = (vector *)malloc(sizeof(vector));
-    }
+    tokenize(&m_str, '/', &tokens);
+    resolve_symbols(&tokens);
 
-    int n;
-    tokenize(&m_str, '/', tokens, &n);
-
-    int k = resolve_symbols(tokens, n);
-
-    for (int i = 0; i < k; i++) {
-        for (int j = 0; j < tokens[i]->size; j++) {
-            console_print("%c", vector_get(tokens[i], j));
+    for (int i = 0; i < tokens.size; i++) {
+        vector *str = vector_get(&tokens, i);
+        for (int j = 0; j < str->size; j++) {
+            console_print("%c", vector_get(str, j));
         }
         console_newline();
     }
 
     vector_destroy(&m_str);
-
-    for (int i = 0; i < 256; i++) {
-        free(tokens[i]);
-    }
+    vector_destroyf(&tokens);
 
     return NULL;
 }
