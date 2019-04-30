@@ -67,6 +67,7 @@ static int vstrrcc(vector *str, char c) {
     return n;
 }
 
+// Error: cd /d./.d./.d/d/d
 static int resolve_symbols(vector *tokens[], int n) {
     int j = n;
 
@@ -89,8 +90,11 @@ static int resolve_symbols(vector *tokens[], int n) {
             i++;
             j++;
         } 
+
+        console_println("%d", i);
     }
 
+    console_println("Return: %d", j);
     return j;
 }
 
