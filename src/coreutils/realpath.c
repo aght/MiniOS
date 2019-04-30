@@ -67,17 +67,13 @@ static int vstrrcc(vector *str, char c) {
     return n;
 }
 
-// Size: 7
-// A B C D E F G /
-//       ^
-// add param to see how many tokens are left
 static int resolve_symbols(vector *tokens[], int n) {
     int j = n;
 
     for (int i = 0; i < j; i++) {
         int c = vstrrcc(tokens[i], '.');
 
-        if (c == 2 && tokens[i]->size > 2) {
+        if ((c == 2 && tokens[i]->size > 2) || (c == 1 && tokens[i]->size > 1)) {
             for (int k = n; k >= i + 2; k--) {
                 tokens[k] = tokens[k - 1];
             }
@@ -85,16 +81,14 @@ static int resolve_symbols(vector *tokens[], int n) {
             tokens[i + 1] = (vector *)malloc(sizeof(vector));
             vector_init(tokens[i + 1]);
 
-            for (int k = 0; k < 2; k++) {
+            for (int k = 0; k < c; k++) {
                 vector_add(tokens[i + 1], '.');
                 vector_remove(tokens[i], vector_rfind(tokens[i], '.'));
             }
 
             i++;
             j++;
-        } else if (c == 1 && tokens[i]->size > 1) {
-            
-        }
+        } 
     }
 
     return j;
