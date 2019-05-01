@@ -44,8 +44,7 @@ static void tokenize(vector *v, char delim, vector *tokens) {
             vector_add(tokens, str);
         }
 
-        j = k;
-        i = k;
+        j = i = k;
     }
 }
 
@@ -63,10 +62,8 @@ static int vstrrcc(vector *str, char c) {
     return n;
 }
 
-static int resolve_symbols(vector *tokens) {
-    int j = tokens->size;
-
-    for (int i = 0; i < j; i++) {
+static void resolve_symbols(vector *tokens) {
+    for (int i = 0; i < tokens->size; i++) {
         vector *str = vector_get(tokens, i);
         int c = vstrrcc(str, '.');
 
@@ -84,20 +81,17 @@ static int resolve_symbols(vector *tokens) {
             vector_insert(tokens, i + 1, a);
 
             i++;
-            j++;
         }
     }
-
-    return j;
 }
 
-static bool m_strcmp(vector* a, const char* b) {
+static bool m_strcmp(vector *a, const char *b) {
     if (!a || !b || a->size != strlen(b)) {
         return false;
     }
 
     for (int i = 0; i < a->size; i++) {
-        if ((char) vector_get(a, i) != b[i]) {
+        if ((char)vector_get(a, i) != b[i]) {
             return false;
         }
     }
@@ -105,7 +99,7 @@ static bool m_strcmp(vector* a, const char* b) {
     return true;
 }
 
-static const char *build_path(vector* tokens) {
+static void build_path(vector *tokens, char *buffer) {
     vector build;
     vector_init(&build);
 
@@ -114,41 +108,57 @@ static const char *build_path(vector* tokens) {
 
         if (m_strcmp(str, "..")) {
             if (build.size > 0) {
-                
-            }            
+                vector_remove(&build, build.size - 1);
+            }
+            continue;
         } else if (m_strcmp(str, ".")) {
-
+            continue;
         }
+
+        vector_add(&build, vector_get(tokens, i));
     }
+
+    int k = 0;
+
+    for (int i = 0; i < build.size; i++) {
+        vector *str = vector_get(&build, i);
+
+        buffer[k++] = '/';
+
+        for (int j = 0; j < str->size; j++) {
+            buffer[k++] = vector_get(str, j);
+            console_print("%c", vector_get(str, j));
+        }
+
+        console_newline();
+    }
+
+    buffer[k] = '\0';
+
+    vector_destroy(&build);
 }
 
-char *realpath_n(const char *path, const char *resolved_path) {
+char *realpath_n(const char *path, char *resolved_path) {
     vector m_str;
+    vector tokens;
 
     vector_init(&m_str);
+    vector_init(&tokens);
 
     for (int i = 0; i < strlen(path) + 1; i++) {
         vector_add(&m_str, path[i]);
     }
 
-    vector tokens;
-    vector_init(&tokens);
-
     tokenize(&m_str, '/', &tokens);
     resolve_symbols(&tokens);
+    build_path(&tokens, resolved_path);
 
-    for (int i = 0; i < tokens.size; i++) {
-        vector *str = vector_get(&tokens, i);
-        for (int j = 0; j < str->size; j++) {
-            console_print("%c", vector_get(str, j));
-        }
-        console_newline();
-    }
+    console_println(resolved_path);
 
     vector_destroy(&m_str);
     vector_destroyf(&tokens);
 
-    return NULL;
+    return resolved_path;
 }
 
 #endif
