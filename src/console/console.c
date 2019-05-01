@@ -55,12 +55,16 @@ void getcwd(char buf[]) {
 
 void chdir(const char *dir) {
     if (!dir) {
-        strcpy(cwd, "/");
+        sprintf(cwd, "/");
         return;
     }
 
+    char concat_dir[4096];
+    sprintf(concat_dir, "%s/%s", cwd, dir);
+
     char resolved_path[4096];
-    realpath_n(dir, resolved_path);
+    realpath_n(concat_dir, resolved_path);
+    sprintf(cwd, resolved_path);
 }
 
 static void prompt() {

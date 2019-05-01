@@ -127,7 +127,6 @@ static void build_path(vector *tokens, char *buffer) {
 
         for (int j = 0; j < str->size; j++) {
             buffer[k++] = vector_get(str, j);
-            console_print("%c", vector_get(str, j));
         }
 
         console_newline();
@@ -152,8 +151,6 @@ char *realpath_n(const char *path, char *resolved_path) {
     tokenize(&m_str, '/', &tokens);
     resolve_symbols(&tokens);
     build_path(&tokens, resolved_path);
-
-    console_println(resolved_path);
 
     vector_destroy(&m_str);
     vector_destroyf(&tokens);
