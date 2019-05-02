@@ -10,15 +10,11 @@ static int vconsole_print(const char *, va_list);
 static void prompt();
 static void run_command(vector *buffer);
 static void input_parse(vector *input, char *buffer[], int *n);
+static int parse_color_escape(const char *str);
 
 typedef struct {
     uint8_t ascii_color;
 } color_state_t;
-
-typedef struct {
-    char c;
-    uint8_t ascii_color;
-} rgbchar_t;
 
 static color_state_t state;
 
@@ -51,8 +47,10 @@ void console_run() {
                 vector_clear(&input_buffer);
                 break;
             case '\b':
-                console_print("\b \b");
-                vector_remove(&input_buffer, input_buffer.size - 1);
+                if (input_buffer.size > 0) {
+                    console_print("\b \b");
+                    vector_remove(&input_buffer, input_buffer.size - 1);
+                }
                 break;
             default: {
                 console_print("%c", input);
@@ -88,7 +86,6 @@ void chdir(const char *dir) {
 
 static void prompt() {
     console_print("\\[034m%s@%s\\[255m:\\[027m%s\\[255m$ ", USERNAME, HOSTNAME, cwd);
-    // console_print("%s@%s:%s$ ", USERNAME, HOSTNAME, cwd);
 }
 
 static void run_command(vector *buffer) {
@@ -154,15 +151,10 @@ static int parse_color_escape(const char *str) {
     }
 
     if (val < 16 || val > 255 || n > 3 || n < 1) {
-        // rgb_t white = {0, 0, 0};
-        // hal_io_video_set_brush_color(white);
         state.ascii_color = 255;
     } else {
         state.ascii_color = val;
     }
-
-    // state.ascii_color = val;
-    // console_println("%d", n);
 
     return 2 + n + 1;
 }
@@ -193,8 +185,6 @@ static int vconsole_print(const char *fmt, va_list args) {
     return printed;
 }
 
-// Color formatting: '\e[033m'
-// Use '\e[0m' to clear
 int console_print(const char *fmt, ...) {
     va_list args;
     int printed = 0;
