@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 
+#include "../drivers/sdcard/SDCard.h"
+#include "../coreutils/coreutils.h"
 #include "console.h"
 
 typedef struct {
