@@ -167,11 +167,11 @@ static int vconsole_print(const char *fmt, va_list args) {
     for (int i = 0; i < printed; i++) {
 
         if (printf_buf[i] == '\\') {
-            int success = parse_color_escape(&printf_buf[i]);
+            int status = parse_color_escape(&printf_buf[i]);
 
             hal_io_video_set_brush_color(ascii_colors[state.ascii_color - 16]);
-            if (success != 0) {
-                i += success;
+            if (status != 0) {
+                i += status;
             }
         }
 
