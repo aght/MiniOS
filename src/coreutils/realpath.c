@@ -128,8 +128,6 @@ static void build_path(vector *tokens, char *buffer) {
         for (int j = 0; j < str->size; j++) {
             buffer[k++] = vector_get(str, j);
         }
-
-        console_newline();
     }
 
     buffer[k] = '\0';

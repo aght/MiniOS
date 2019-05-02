@@ -1,4 +1,4 @@
-Clear-Host;
+# Clear-Host;
 
 $exec=$args[0]
 $ErrorActionPreference = "Stop"
@@ -24,6 +24,7 @@ Write-Host "Building..."
 	src/uart/uart.c `
 	src/console/console.c `
 	src/console/command.c `
+	src/console/ascii_colors.c `
 	src/coreutils/realpath.c `
 	src/vector/vector.c `
   -o build/kernel.elf `

@@ -11,6 +11,17 @@ static void prompt();
 static void run_command(vector *buffer);
 static void input_parse(vector *input, char *buffer[], int *n);
 
+typedef struct {
+    uint8_t ascii_color;
+} color_state_t;
+
+typedef struct {
+    char c;
+    uint8_t ascii_color;
+} rgbchar_t;
+
+static color_state_t state;
+
 static rgb_t text_color = {255, 255, 255};
 static rgb_t fill_color = {0, 0, 0};
 
@@ -18,8 +29,10 @@ static vector input_buffer;
 static char cwd[4096];
 
 void console_init() {
+    state.ascii_color = 255;
+
     vector_init(&input_buffer);
-    hal_io_video_set_brush_color(text_color);
+    hal_io_video_set_brush_color(ascii_colors[state.ascii_color - 16]);
     hal_io_video_set_fill_color(fill_color);
     chdir(NULL);
     prompt();
@@ -64,14 +77,25 @@ void chdir(const char *dir) {
 
     char resolved_path[4096];
     realpath_n(concat_dir, resolved_path);
+
+    if (strlen(resolved_path) == 0) {
+        sprintf(cwd, "/");
+        return;
+    }
+
     sprintf(cwd, resolved_path);
 }
 
 static void prompt() {
-    console_print("%s@%s:%s$ ", USERNAME, HOSTNAME, cwd);
+    console_print("\\[034m%s@%s\\[255m:\\[027m%s\\[255m$ ", USERNAME, HOSTNAME, cwd);
+    // console_print("%s@%s:%s$ ", USERNAME, HOSTNAME, cwd);
 }
 
 static void run_command(vector *buffer) {
+    if (buffer->size == 0) {
+        return;
+    }
+
     char *tokens[256];
     int n;
 
@@ -84,18 +108,14 @@ static void run_command(vector *buffer) {
         return;
     }
 
-    if (n > 1) {
-        cmd->action(&tokens[1], n - 1);
-    } else {
-        cmd->action(NULL, n - 1);
-    }
+    cmd->action(n > 1 ? &tokens[1] : NULL, n - 1);
 }
 
 static void input_parse(vector *input, char *buffer[], int *n) {
     char str[input->size + 1];
 
     int i;
-    for (i = 0; i < input->size + 1; i++) {
+    for (i = 0; i < input->size; i++) {
         str[i] = vector_get(input, i);
     }
     str[i] = '\0';
@@ -112,6 +132,41 @@ static void input_parse(vector *input, char *buffer[], int *n) {
     *n = --j;
 }
 
+static int parse_color_escape(const char *str) {
+    int len = strlen(str);
+
+    if (len < 4 || str[1] != '[') {
+        return 0;
+    }
+
+    char *ptr = &str[2];
+    int n = 0;
+
+    while (isdigit(*ptr)) {
+        ptr++;
+        n++;
+    }
+
+    int val = strtol(&str[2], NULL, 10);
+
+    if (2 + n >= len || str[2 + n] != 'm') {
+        return 0;
+    }
+
+    if (val < 16 || val > 255 || n > 3 || n < 1) {
+        // rgb_t white = {0, 0, 0};
+        // hal_io_video_set_brush_color(white);
+        state.ascii_color = 255;
+    } else {
+        state.ascii_color = val;
+    }
+
+    // state.ascii_color = val;
+    // console_println("%d", n);
+
+    return 2 + n + 1;
+}
+
 static int vconsole_print(const char *fmt, va_list args) {
     char printf_buf[512];
     int printed = 0;
@@ -119,13 +174,27 @@ static int vconsole_print(const char *fmt, va_list args) {
     printed = vsprintf(printf_buf, fmt, args);
 
     for (int i = 0; i < printed; i++) {
+
+        if (printf_buf[i] == '\\') {
+            int success = parse_color_escape(&printf_buf[i]);
+
+            hal_io_video_set_brush_color(ascii_colors[state.ascii_color - 16]);
+            if (success != 0) {
+                i += success;
+            }
+        }
+
         hal_io_serial_putc(printf_buf[i]);
         hal_io_video_putc(printf_buf[i]);
     }
 
+    hal_io_video_set_brush_color(ascii_colors[255 - 16]);
+
     return printed;
 }
 
+// Color formatting: '\e[033m'
+// Use '\e[0m' to clear
 int console_print(const char *fmt, ...) {
     va_list args;
     int printed = 0;

@@ -4,11 +4,13 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "../drivers/stdio/emb-stdio.h"
 #include "../hal/hal.h"
 #include "../coreutils/coreutils.h"
 #include "command.h"
+#include "ascii_colors.h"
 
 void console_init();
 void console_run();
