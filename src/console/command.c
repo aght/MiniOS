@@ -5,7 +5,7 @@
 
 static bool pwd(const char *params[], int n);
 static bool cd(const char *params[], int n);
-static bool ls(const char* params[], int n);
+static bool ls(const char *params[], int n);
 
 static command_t command_list[] = {
     {"pwd", pwd},
@@ -47,17 +47,18 @@ static bool ls(const char *params[], int n) {
 
     if (n != 0) {
         sprintf(path, "%s/%s/*.*", path, params[0]);
-        realpath_n(path, path);
     } else {
-        sprintf(path, "%s*.*", path);
+        sprintf(path, "%s/*.*", path);
     }
+
+    realpath_n(path, path);
 
     for (int i = 0; path[i] != '\0'; i++) {
         if (path[i] == '/') {
             path[i] = '\\';
         }
     }
-    
+
     HANDLE fh;
     FIND_DATA find;
     fh = sdFindFirstFile(path, &find);
@@ -65,15 +66,15 @@ static bool ls(const char *params[], int n) {
         int accessHour12 = find.CreateDT.tm_hour > 12 ? find.CreateDT.tm_hour - 12 : find.CreateDT.tm_hour == 0 ? 12 : find.CreateDT.tm_hour;
 
         console_println("%02d/%02d/%4d  %02d:%02d %2s  %5s  %9lu  %s",
-                      find.CreateDT.tm_mon,
-                      find.CreateDT.tm_mday,
-                      find.CreateDT.tm_year + 1900,
-                      accessHour12,
-                      find.CreateDT.tm_min,
-                      find.CreateDT.tm_hour < 12 ? "AM" : "PM",
-                      find.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY ? "<DIR>" : "",
-                      (unsigned long)find.nFileSizeLow,
-                      find.cFileName);
+                        find.CreateDT.tm_mon,
+                        find.CreateDT.tm_mday,
+                        find.CreateDT.tm_year + 1900,
+                        accessHour12,
+                        find.CreateDT.tm_min,
+                        find.CreateDT.tm_hour < 12 ? "AM" : "PM",
+                        find.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY ? "<DIR>" : "",
+                        (unsigned long)find.nFileSizeLow,
+                        find.cFileName);
     } while (sdFindNextFile(fh, &find) != 0);
     sdFindClose(fh);
 
