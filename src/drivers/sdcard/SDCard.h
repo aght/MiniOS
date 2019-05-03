@@ -196,6 +196,7 @@ SDRESULT sdClearBlocks (uint32_t startBlock, uint32_t numBlocks);
 #define FILE_ATTRIBUTE_ARCHIVE		0x20							// Archive file
 #define FILE_ATTRIBUTE_DEVICE		0x40							// Device file
 #define FILE_ATTRIBUTE_NORMAL		0x80							// Normal file
+#define FILE_ATTRIBUTE_INVALID		0xa0
 
 typedef char LFN_NAME[256];											// Long file name
 typedef char SFN_NAME[11];											// Short file name

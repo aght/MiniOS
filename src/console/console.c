@@ -69,22 +69,25 @@ void chdir(const char *dir) {
     char resolved_path[512];
 
     if (!dir) {
-        sprintf(cwd, "/");
-        return;
-    }
-
-    if (strlen(dir) >= 1 && dir[0] == '/') {
+        sprintf(concat_dir, "/");
+    } else if (strlen(dir) >= 1 && dir[0] == '/') {
         sprintf(concat_dir, "%s", dir);
     } else {
         sprintf(concat_dir, "%s/%s", cwd, dir);
     }
 
-    if (realpath_n(concat_dir, resolved_path)) {
-        sprintf(cwd, resolved_path);
-        return;
-    }
+    int file_type = realpath_n(concat_dir, resolved_path);
 
-    console_println("%s: is not a file or directory", dir);
+    switch (file_type) {
+        case FILE_ATTRIBUTE_DIRECTORY:
+            sprintf(cwd, resolved_path);
+            break;
+        case FILE_ATTRIBUTE_NORMAL:
+            console_println("%s: is a file", dir);
+            break;
+        default:
+            console_println("%s: is not a file or directory", dir);
+    }
 }
 
 static void prompt() {

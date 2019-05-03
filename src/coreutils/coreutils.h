@@ -6,6 +6,6 @@
 #include "../vector/vector.h"
 #include "../console/console.h"
 
-char *realpath_n(const char *path, char *resolved_path);
+int realpath_n(const char *path, char *resolved_path);
 
 #endif

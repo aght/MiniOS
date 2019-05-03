@@ -121,7 +121,7 @@ static char *vtostr(vector *vec, char buffer[]) {
     return buffer;
 }
 
-static bool stricmp(const char* a, const char* b) {
+static bool stricmp(const char *a, const char *b) {
     if (strlen(a) != strlen(b)) {
         return false;
     }
@@ -135,7 +135,7 @@ static bool stricmp(const char* a, const char* b) {
     return true;
 }
 
-static bool build_path(vector *tokens, char *buffer) {
+static int build_path(vector *tokens, char *buffer) {
     vector build;
     vector_init(&build);
 
@@ -155,7 +155,7 @@ static bool build_path(vector *tokens, char *buffer) {
     }
 
     if (build.size == 0) {
-        vector *str = malloc(sizeof(vector));
+        vector *str = (vector *)malloc(sizeof(vector));
         vector_init(str);
         vector_add(str, '/');
 
@@ -163,7 +163,8 @@ static bool build_path(vector *tokens, char *buffer) {
     }
 
     int k = 0;
-    bool has_match;
+    bool has_match = false;
+    int type;
 
     for (int i = 0; i < build.size; i++) {
         has_match = false;
@@ -192,6 +193,13 @@ static bool build_path(vector *tokens, char *buffer) {
             do {
                 if (stricmp(find.cFileName, vtoken)) {
                     has_match = true;
+
+                    if (find.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY) {
+                        type = FILE_ATTRIBUTE_DIRECTORY;
+                    } else {
+                        type = FILE_ATTRIBUTE_NORMAL;
+                    }
+
                     break;
                 }
             } while (sdFindNextFile(fh, &find) != 0);
@@ -205,18 +213,22 @@ static bool build_path(vector *tokens, char *buffer) {
 
     buffer[k] = '\0';
 
+    if (strlen(buffer) == 1 && strcmp(buffer, "/") == 0) {
+        return FILE_ATTRIBUTE_DIRECTORY;
+    }
+
     vector_destroy(&build);
 
-    return has_match;
+    return !has_match ? FILE_ATTRIBUTE_INVALID : type;
 }
 
-char *realpath_n(const char *path, char *resolved_path) {
+int realpath_n(const char *path, char *resolved_path) {
     int i;
     vector m_str;
     vector tokens;
 
-    if (!path) {
-        return NULL;
+    if (!path || strlen(path) == 0) {
+        return FILE_ATTRIBUTE_INVALID;
     }
 
     vector_init(&m_str);
@@ -229,7 +241,7 @@ char *realpath_n(const char *path, char *resolved_path) {
 
     tokenize(&m_str, '/', &tokens);
     resolve_symbols(&tokens);
-    bool is_valid = build_path(&tokens, resolved_path);
+    int file_type = build_path(&tokens, resolved_path);
 
     vector_destroy(&m_str);
 
@@ -239,11 +251,7 @@ char *realpath_n(const char *path, char *resolved_path) {
 
     vector_destroyf(&tokens);
 
-    if (!is_valid) {
-        return NULL;
-    }
-
-    return resolved_path;
+    return file_type;
 }
 
 #endif
