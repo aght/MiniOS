@@ -65,18 +65,26 @@ void getcwd(char buf[]) {
 }
 
 void chdir(const char *dir) {
+    char concat_dir[512];
+    char resolved_path[512];
+
     if (!dir) {
         sprintf(cwd, "/");
         return;
     }
 
-    char concat_dir[512];
-    sprintf(concat_dir, "%s/%s", cwd, dir);
+    if (strlen(dir) >= 1 && dir[0] == '/') {
+        sprintf(concat_dir, "%s", dir);
+    } else {
+        sprintf(concat_dir, "%s/%s", cwd, dir);
+    }
 
-    char resolved_path[512];
-    realpath_n(concat_dir, resolved_path);
+    if (realpath_n(concat_dir, resolved_path)) {
+        sprintf(cwd, resolved_path);
+        return;
+    }
 
-    sprintf(cwd, resolved_path);
+    console_println("%s: is not a file or directory", dir);
 }
 
 static void prompt() {

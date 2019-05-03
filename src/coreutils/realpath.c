@@ -121,7 +121,21 @@ static char *vtostr(vector *vec, char buffer[]) {
     return buffer;
 }
 
-static void build_path(vector *tokens, char *buffer) {
+static bool stricmp(const char* a, const char* b) {
+    if (strlen(a) != strlen(b)) {
+        return false;
+    }
+
+    for (int i = 0; a[i] != '\0'; i++) {
+        if (tolower(a[i]) != tolower(b[i])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static bool build_path(vector *tokens, char *buffer) {
     vector build;
     vector_init(&build);
 
@@ -140,8 +154,6 @@ static void build_path(vector *tokens, char *buffer) {
         vector_add(&build, vector_get(tokens, i));
     }
 
-    int k = 0;
-
     if (build.size == 0) {
         vector *str = malloc(sizeof(vector));
         vector_init(str);
@@ -150,37 +162,38 @@ static void build_path(vector *tokens, char *buffer) {
         vector_add(&build, str);
     }
 
+    int k = 0;
+    bool has_match;
+
     for (int i = 0; i < build.size; i++) {
+        has_match = false;
+
         vector *str = vector_get(&build, i);
 
         if (!(str->size == 1 && m_strcmp(str, "/"))) {
             buffer[k++] = '/';
         }
 
+        buffer[k] = '\0';
+
         vector *fstr = vector_get(&build, i);
 
         if (fstr) {
-            bool has_match = false;
-            char token[512];
+            char vtoken[512];
             char buffer_copy[512];
 
-            // console_println("%s : %s", buffer, vtostr(fstr, token));
-
-            if (strcmp(buffer, "/") == 0) {
-                sprintf(buffer_copy, "%s*.*", buffer);
-            } else {
-                sprintf(buffer_copy, "%s/*.*", buffer);
-            }
-            
+            sprintf(buffer_copy, "%s*.*", buffer);
             strreplc(buffer_copy, '/', '\\');
-
-            console_println(buffer_copy);
+            vtostr(fstr, vtoken);
 
             HANDLE fh;
             FIND_DATA find;
-            fh = sdFindFirstFile(buffer, &find);
+            fh = sdFindFirstFile(buffer_copy, &find);
             do {
-                console_println(find.cFileName);
+                if (stricmp(find.cFileName, vtoken)) {
+                    has_match = true;
+                    break;
+                }
             } while (sdFindNextFile(fh, &find) != 0);
             sdFindClose(fh);
         }
@@ -193,12 +206,18 @@ static void build_path(vector *tokens, char *buffer) {
     buffer[k] = '\0';
 
     vector_destroy(&build);
+
+    return has_match;
 }
 
 char *realpath_n(const char *path, char *resolved_path) {
     int i;
     vector m_str;
     vector tokens;
+
+    if (!path) {
+        return NULL;
+    }
 
     vector_init(&m_str);
     vector_init(&tokens);
@@ -210,7 +229,7 @@ char *realpath_n(const char *path, char *resolved_path) {
 
     tokenize(&m_str, '/', &tokens);
     resolve_symbols(&tokens);
-    build_path(&tokens, resolved_path);
+    bool is_valid = build_path(&tokens, resolved_path);
 
     vector_destroy(&m_str);
 
@@ -219,6 +238,10 @@ char *realpath_n(const char *path, char *resolved_path) {
     }
 
     vector_destroyf(&tokens);
+
+    if (!is_valid) {
+        return NULL;
+    }
 
     return resolved_path;
 }
