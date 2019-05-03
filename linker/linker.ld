@@ -4,22 +4,20 @@ MEMORY
 	ram : ORIGIN = 0x8000, LENGTH = 0x8000000 /* 0x10000000=256MB Half of that is 125MB=0x8000000 */
 }																						/* Note that LENGTH as define here MUST match SYS_SYSTEM_MEM_AVAILABLE */
 																						/* in kernel.h  */
-__stack_size__ = DEFINED(__stack_size__) ? __stack_size__ : 0x3000;
+__stack_size__ = DEFINED(__stack_size__) ? __stack_size__ : 0x10000;
 
 SECTIONS
 {
    . = 0x8000;
     __start = .;
 
-
-    .text : {
+    .text : 
+    {
         __text_start = .;
         KEEP(*(.boot))
         *(.text)
         __text_end = .;
     } > ram
-
-
 
     .data :
     {
@@ -29,8 +27,6 @@ SECTIONS
         __data_end__ = .;
     } > ram
 
-
-
     .bss (NOLOAD):
     {
        . = ALIGN(4);
@@ -39,30 +35,27 @@ SECTIONS
         __bss_end__ = .;
     } > ram
 
-
-
-    .rodata : {
+    .rodata :
+    {
         . = ALIGN(4);
         __rodata_start = .;
         *(.rodata)
         __rodata_end = .;
     } > ram
 
-
-
-      .stack (NOLOAD):
-      {
-          . = ALIGN(8);
-          __stack_start = .;
-          . = . + __stack_size__;
-          __stack_end = .;
-      } > ram
-
-    .Heap :
+    .stack (NOLOAD):
     {
-     . = ALIGN(4);
-     __heap_start__ = .;
-     _end = .; PROVIDE (end = .); /* Any memory from here is free to use so this is end of code and start of heap */
+        . = ALIGN(8);
+        __stack_start = .;
+        . = . + __stack_size__;
+        __stack_end = .;
+    } > ram
+
+    .heap :
+    {
+        . = ALIGN(4);
+        __heap_start__ = .;
+        _end = .; PROVIDE (end = .); /* Any memory from here is free to use so this is end of code and start of heap */
     } > ram
 
     /* Remove information from the standard libraries */
@@ -93,8 +86,6 @@ SECTIONS
         *(.gnu_debuglink) 
         *(.gnu.lto_*)
     }
-
-
 
 	__end = .;
 }

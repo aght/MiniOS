@@ -22,7 +22,7 @@ static rgb_t text_color = {255, 255, 255};
 static rgb_t fill_color = {0, 0, 0};
 
 static vector input_buffer;
-static char cwd[4096];
+static char cwd[512];
 
 void console_init() {
     state.ascii_color = 255;
@@ -70,10 +70,10 @@ void chdir(const char *dir) {
         return;
     }
 
-    char concat_dir[4096];
+    char concat_dir[512];
     sprintf(concat_dir, "%s/%s", cwd, dir);
 
-    char resolved_path[4096];
+    char resolved_path[512];
     realpath_n(concat_dir, resolved_path);
 
     sprintf(cwd, resolved_path);

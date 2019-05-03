@@ -99,6 +99,28 @@ static bool m_strcmp(vector *a, const char *b) {
     return true;
 }
 
+static void strreplc(char *str, char old, char new) {
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (str[i] == old) {
+            str[i] = new;
+        }
+    }
+}
+
+static char *vtostr(vector *vec, char buffer[]) {
+    if (!vec) {
+        return NULL;
+    }
+
+    int j;
+    for (j = 0; j < vec->size; j++) {
+        buffer[j] = vector_get(vec, j);
+    }
+    buffer[j] = '\0';
+
+    return buffer;
+}
+
 static void build_path(vector *tokens, char *buffer) {
     vector build;
     vector_init(&build);
@@ -120,10 +142,48 @@ static void build_path(vector *tokens, char *buffer) {
 
     int k = 0;
 
+    if (build.size == 0) {
+        vector *str = malloc(sizeof(vector));
+        vector_init(str);
+        vector_add(str, '/');
+
+        vector_add(&build, str);
+    }
+
     for (int i = 0; i < build.size; i++) {
         vector *str = vector_get(&build, i);
 
-        buffer[k++] = '/';
+        if (!(str->size == 1 && m_strcmp(str, "/"))) {
+            buffer[k++] = '/';
+        }
+
+        vector *fstr = vector_get(&build, i);
+
+        if (fstr) {
+            bool has_match = false;
+            char token[512];
+            char buffer_copy[512];
+
+            // console_println("%s : %s", buffer, vtostr(fstr, token));
+
+            if (strcmp(buffer, "/") == 0) {
+                sprintf(buffer_copy, "%s*.*", buffer);
+            } else {
+                sprintf(buffer_copy, "%s/*.*", buffer);
+            }
+            
+            strreplc(buffer_copy, '/', '\\');
+
+            console_println(buffer_copy);
+
+            HANDLE fh;
+            FIND_DATA find;
+            fh = sdFindFirstFile(buffer, &find);
+            do {
+                console_println(find.cFileName);
+            } while (sdFindNextFile(fh, &find) != 0);
+            sdFindClose(fh);
+        }
 
         for (int j = 0; j < str->size; j++) {
             buffer[k++] = vector_get(str, j);
@@ -132,38 +192,7 @@ static void build_path(vector *tokens, char *buffer) {
 
     buffer[k] = '\0';
 
-    if (strlen(buffer) == 0) {
-        sprintf(buffer, "/");
-    }
-
     vector_destroy(&build);
-}
-
-static void strreplc(char *str, char old, char new) {
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (str[i] == old) {
-            str[i] = new;
-        }
-    }
-}
-
-static bool is_valid_path(const char *path) {
-    char tmp[4096];
-    char copy[4096];
-
-    strcpy(copy, path);
-    strreplc(copy, '/', '\\');
-
-    // console_println(copy);
-
-    for (int i = 0; i < strlen(copy) + 1; i++) {
-        if (copy[i] == '\\' || copy[i] == '\0') {
-            for (int j = 0; j < i; j++) {
-                console_print("%c", copy[j]);
-            }
-            console_newline();
-        }
-    }
 }
 
 char *realpath_n(const char *path, char *resolved_path) {
@@ -182,8 +211,6 @@ char *realpath_n(const char *path, char *resolved_path) {
     tokenize(&m_str, '/', &tokens);
     resolve_symbols(&tokens);
     build_path(&tokens, resolved_path);
-
-    bool is_valid = is_valid_path(resolved_path);
 
     vector_destroy(&m_str);
 

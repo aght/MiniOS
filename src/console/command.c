@@ -23,7 +23,7 @@ command_t *find_command(const char *str) {
 }
 
 static bool pwd(const char *params[], int n) {
-    char cwd[4096];
+    char cwd[512];
     getcwd(cwd);
     console_println(cwd);
 
@@ -41,7 +41,7 @@ static bool cd(const char *params[], int n) {
 }
 
 static bool ls(const char *params[], int n) {
-    char path[4096];
+    char path[512];
 
     getcwd(path);
 
