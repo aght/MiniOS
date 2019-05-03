@@ -76,10 +76,6 @@ void chdir(const char *dir) {
     char resolved_path[4096];
     realpath_n(concat_dir, resolved_path);
 
-    if (strlen(resolved_path) == 0) {
-        return;
-    }
-
     sprintf(cwd, resolved_path);
 }
 

@@ -32,7 +32,7 @@ static bool pwd(const char *params[], int n) {
 
 static bool cd(const char *params[], int n) {
     if (n == 0) {
-        chdir("/");
+        chdir(NULL);
     } else {
         chdir(params[0]);
     }

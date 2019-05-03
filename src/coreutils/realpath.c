@@ -132,25 +132,65 @@ static void build_path(vector *tokens, char *buffer) {
 
     buffer[k] = '\0';
 
+    if (strlen(buffer) == 0) {
+        sprintf(buffer, "/");
+    }
+
     vector_destroy(&build);
 }
 
+static void strreplc(char *str, char old, char new) {
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (str[i] == old) {
+            str[i] = new;
+        }
+    }
+}
+
+static bool is_valid_path(const char *path) {
+    char tmp[4096];
+    char copy[4096];
+
+    strcpy(copy, path);
+    strreplc(copy, '/', '\\');
+
+    // console_println(copy);
+
+    for (int i = 0; i < strlen(copy) + 1; i++) {
+        if (copy[i] == '\\' || copy[i] == '\0') {
+            for (int j = 0; j < i; j++) {
+                console_print("%c", copy[j]);
+            }
+            console_newline();
+        }
+    }
+}
+
 char *realpath_n(const char *path, char *resolved_path) {
+    int i;
     vector m_str;
     vector tokens;
 
     vector_init(&m_str);
     vector_init(&tokens);
 
-    for (int i = 0; i < strlen(path) + 1; i++) {
+    for (i = 0; i < path[i] != '\0'; i++) {
         vector_add(&m_str, path[i]);
     }
+    vector_add(&m_str, path[i]);
 
     tokenize(&m_str, '/', &tokens);
     resolve_symbols(&tokens);
     build_path(&tokens, resolved_path);
 
+    bool is_valid = is_valid_path(resolved_path);
+
     vector_destroy(&m_str);
+
+    for (i = 0; i < tokens.size; i++) {
+        vector_destroy(vector_get(&tokens, i));
+    }
+
     vector_destroyf(&tokens);
 
     return resolved_path;
