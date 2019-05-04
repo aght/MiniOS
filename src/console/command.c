@@ -60,7 +60,7 @@ static bool ls(const char *params[], int n) {
     FIND_DATA find;
     fh = sdFindFirstFile(path, &find);
     do {
-        int accessHour12 = find.CreateDT.tm_hour > 12 ? find.CreateDT.tm_hour - 12 : find.CreateDT.tm_hour == 0 ? 12 : find.CreateDT.tm_hour;
+        int accessHour12 = (find.CreateDT.tm_hour - 1) % 12 + 1;
 
         console_println("%02d/%02d/%4d  %02d:%02d %2s  %5s  %9lu  %s",
                         find.CreateDT.tm_mon,
