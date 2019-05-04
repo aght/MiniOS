@@ -99,8 +99,6 @@ static bool cat(const char *params[], int n) {
     FILE fh;
     file_t file;
 
-    console_println(path);
-
     fh = fopen(path);
 
     if (fread(fh, &file)) {
