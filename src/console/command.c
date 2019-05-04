@@ -89,10 +89,10 @@ static bool cat(const char *params[], int n) {
 
     switch (file_type) {
         case FILE_ATTRIBUTE_DIRECTORY:
-            console_println("%s: is a directory");
+            console_println("%s: is a directory", path);
             return false;
         case FILE_ATTRIBUTE_INVALID:
-            console_println("%s: is not a file or directory");
+            console_println("%s: is not a file or directory", path);
             return false;
     }
 
@@ -113,6 +113,7 @@ static bool cat(const char *params[], int n) {
     }
 
     fclose(fh);
+    free(file.bytes);
 }
 
 #endif
