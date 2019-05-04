@@ -18,8 +18,8 @@ typedef struct {
 
 uint32_t hal_io_get_cursor_x();
 uint32_t hal_io_get_cursor_y();
-uint32_t hal_io_set_cursor_x(uint32_t);
-uint32_t hal_io_set_cursor_y(uint32_t);
+void hal_io_set_cursor_x(uint32_t);
+void hal_io_set_cursor_y(uint32_t);
 
 uint32_t hal_io_video_init(void);
 void hal_io_video_puts(uint8_t *);

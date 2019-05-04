@@ -8,13 +8,15 @@ static bool cd(const char *params[], int n);
 static bool ls(const char *params[], int n);
 static bool cat(const char *params[], int n);
 static bool hexdump(const char *params[], int n);
+static bool clear(const char* params[], int n);
 
 static command_t command_list[] = {
     {"pwd", pwd},
     {"cd", cd},
     {"ls", ls},
     {"cat", cat},
-    {"hexdump", hexdump}};
+    {"hexdump", hexdump},
+    {"clear", clear}};
 
 command_t *find_command(const char *str) {
     for (int i = 0; i < sizeof(command_list); i++) {
@@ -179,6 +181,17 @@ static bool hexdump(const char *params[], int n) {
     free(file.bytes);
 
     return true;
+}
+
+static bool clear(const char* params[], int n) {
+    for (int i = 0; i < SCREEN_HEIGHT; i++) {
+        for (int j = 0; j < SCREEN_WIDTH; j++) {
+            hal_io_video_put_pixel(j, i, ascii_colors[16 - 16]);
+        }
+    }
+
+    hal_io_set_cursor_x(0);
+    hal_io_set_cursor_y(0); 
 }
 
 #endif

@@ -20,11 +20,11 @@ uint32_t hal_io_get_cursor_y() {
     return cursorY;
 }
 
-uint32_t hal_io_set_cursor_x(uint32_t x) {
+void hal_io_set_cursor_x(uint32_t x) {
     cursorX = x;
 }
 
-uint32_t hal_io_set_cursor_y(uint32_t y) {
+void hal_io_set_cursor_y(uint32_t y) {
     cursorY = y;
 }
 
