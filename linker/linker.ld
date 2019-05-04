@@ -2,8 +2,8 @@
 MEMORY
 {
 	ram : ORIGIN = 0x8000, LENGTH = 0x8000000 /* 0x10000000=256MB Half of that is 125MB=0x8000000 */
-}																						/* Note that LENGTH as define here MUST match SYS_SYSTEM_MEM_AVAILABLE */
-																						/* in kernel.h  */
+}																						
+
 __stack_size__ = DEFINED(__stack_size__) ? __stack_size__ : 0x10000;
 
 SECTIONS
@@ -55,6 +55,7 @@ SECTIONS
     {
         . = ALIGN(4);
         __heap_start__ = .;
+        *(.heap)
         _end = .; PROVIDE (end = .); /* Any memory from here is free to use so this is end of code and start of heap */
     } > ram
 

@@ -26,7 +26,9 @@ Write-Host "Building..."
 	src/console/command.c `
 	src/console/ascii_colors.c `
 	src/coreutils/realpath.c `
+	src/coreutils/trpath.c `
 	src/vector/vector.c `
+	src/utils/strutils.c `
   -o build/kernel.elf `
 	-O0	`
 	-lc -lm -lg -lgcc

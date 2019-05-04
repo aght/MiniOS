@@ -99,14 +99,6 @@ static bool m_strcmp(vector *a, const char *b) {
     return true;
 }
 
-static void strreplc(char *str, char old, char new) {
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (str[i] == old) {
-            str[i] = new;
-        }
-    }
-}
-
 static char *vtostr(vector *vec, char buffer[]) {
     if (!vec) {
         return NULL;
@@ -119,20 +111,6 @@ static char *vtostr(vector *vec, char buffer[]) {
     buffer[j] = '\0';
 
     return buffer;
-}
-
-static bool stricmp(const char *a, const char *b) {
-    if (strlen(a) != strlen(b)) {
-        return false;
-    }
-
-    for (int i = 0; a[i] != '\0'; i++) {
-        if (tolower(a[i]) != tolower(b[i])) {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 static int build_path(vector *tokens, char *buffer) {

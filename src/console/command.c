@@ -41,22 +41,17 @@ static bool cd(const char *params[], int n) {
 }
 
 static bool ls(const char *params[], int n) {
+    char cwd[512];
     char path[512];
+    int file_type;
 
-    getcwd(path);
+    file_type = trpath(n != 0 ? params[0] : NULL, getcwd(cwd), "*.*", path);
 
-    if (n != 0) {
-        sprintf(path, "%s/%s/*.*", path, params[0]);
-    } else {
-        sprintf(path, "%s/*.*", path);
-    }
-
-    realpath_n(path, path);
-
-    for (int i = 0; path[i] != '\0'; i++) {
-        if (path[i] == '/') {
-            path[i] = '\\';
-        }
+    switch (file_type) {
+        case FILE_ATTRIBUTE_NORMAL:
+            break;
+        case FILE_ATTRIBUTE_INVALID:
+            break;
     }
 
     HANDLE fh;

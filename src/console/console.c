@@ -60,8 +60,9 @@ void console_run() {
     }
 }
 
-void getcwd(char buf[]) {
+char* getcwd(char buf[]) {
     sprintf(buf, cwd);
+    return cwd;
 }
 
 void chdir(const char *dir) {

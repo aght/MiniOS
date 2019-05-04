@@ -15,7 +15,7 @@
 void console_init();
 void console_run();
 
-void getcwd(char buf[]);
+char* getcwd(char buf[]);
 void chdir(const char *dir);
 
 int console_print(const char *fmt, ...);
