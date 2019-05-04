@@ -4,15 +4,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "drivers/stdio/emb-stdio.h"
+#include "console/console.h"
 #include "drivers/sdcard/SDCard.h"
+#include "drivers/stdio/emb-stdio.h"
 #include "hal/hal.h"
 
-void main(uint32_t r0, uint32_t r1, uint32_t atags)
-{
+void main(void) {
     hal_io_video_init();
     hal_io_serial_init();
     sdInitCard(NULL, NULL, true);
+    console_init();
 
-    printf("Hello, World!\n");
+    console_run();
 }

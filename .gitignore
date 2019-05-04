@@ -1,2 +1,4 @@
 .vscode/**
+build/**
 sdcard/sdcard.img
+!build/.gitkeep

@@ -31,7 +31,6 @@
 #include <string.h>			// strnlen used
 
 #include "emb-stdio.h"			// This units header
-#include "../../kernel.h"		//Nothing will get printed withput this.... it checks for some defines
 #include "../../hal/hal.h"
 
 static int skip_atoi(const char **s)
@@ -325,10 +324,7 @@ int printf(const char *fmt, ...)
 	printed = vsprintf(printf_buf, fmt, args);
 	va_end(args);
 
-	rgb_t text_color = {255, 255, 255};
-
 	for (int i = 0; i < printed; i++){
-		hal_io_video_putc(printf_buf[i], text_color);
 		hal_io_serial_putc(printf_buf[i]);
 	}
 
