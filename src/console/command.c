@@ -7,12 +7,14 @@ static bool pwd(const char *params[], int n);
 static bool cd(const char *params[], int n);
 static bool ls(const char *params[], int n);
 static bool cat(const char *params[], int n);
+static bool hexdump(const char *params[], int n);
 
 static command_t command_list[] = {
     {"pwd", pwd},
     {"cd", cd},
     {"ls", ls},
-    {"cat", cat}};
+    {"cat", cat},
+    {"hexdump", hexdump}};
 
 command_t *find_command(const char *str) {
     for (int i = 0; i < sizeof(command_list); i++) {
@@ -112,6 +114,71 @@ static bool cat(const char *params[], int n) {
 
     fclose(fh);
     free(file.bytes);
+
+    return true;
+}
+
+static bool hexdump(const char *params[], int n) {
+    char cwd[512];
+    char path[512];
+    int file_type;
+
+    file_type = trpath(n != 0 ? params[0] : NULL, getcwd(cwd), NULL, path);
+
+    switch (file_type) {
+        case FILE_ATTRIBUTE_DIRECTORY:
+            console_println("%s: is a directory", path);
+            return false;
+        case FILE_ATTRIBUTE_INVALID:
+            console_println("%s: is not a file or directory", path);
+            return false;
+    }
+
+    FILE fh;
+    file_t file;
+
+    fh = fopen(path);
+
+    if (fread(fh, &file)) {
+        const int bytes_per_line = 16;
+        const int bytes_per_section = 2;
+
+        for (int i = 0; i < file.file_size; i += bytes_per_line) {
+            console_print("%08x  ", i);
+
+            for (int j = 0, n = i; j < bytes_per_line / bytes_per_section; j++) {
+                for (int k = 0; k < bytes_per_section; k++, n++) {
+                    if (n < file.file_size) {
+                        console_print("%02x", file.bytes[n]);
+                    } else {
+                        console_print("%2s", "");
+                    }
+                }
+                console_print(" ");
+            }
+
+            console_print(" ");
+
+            for (int j = 0, k = i; j < bytes_per_line; j++, k++) {
+                if (k < file.file_size) {
+                    if ((char)file.bytes[k] == '\n' || (char)file.bytes[k] == '\r') {
+                        console_print("%c", '.');
+                    } else {
+                        console_print("%c", (char)file.bytes[k]);
+                    }
+                }
+            }
+
+            console_newline();
+        }
+    } else {
+        console_println("unable to read file");
+    }
+
+    fclose(fh);
+    free(file.bytes);
+
+    return true;
 }
 
 #endif
