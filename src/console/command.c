@@ -184,8 +184,8 @@ static bool hexdump(const char *params[], int n) {
 }
 
 static bool clear(const char* params[], int n) {
-    for (int i = 0; i < SCREEN_HEIGHT; i++) {
-        for (int j = 0; j < SCREEN_WIDTH; j++) {
+    for (uint_fast32_t i = 0; i < SCREEN_HEIGHT; i++) {
+        for (uint_fast32_t j = 0; j < SCREEN_WIDTH; j++) {
             hal_io_video_put_pixel(j, i, ascii_colors[16 - 16]);
         }
     }
