@@ -26,8 +26,6 @@ int trpath(const char *path, const char *cwd, const char *append, char buffer[])
 
     strreplc(translated_path, '/', '\\');
 
-    console_println(translated_path);
-
     if (append) {
         if (strcmp(translated_path, "\\") == 0) {
             sprintf(translated_path, "%s%s", translated_path, append);

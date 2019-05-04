@@ -49,9 +49,11 @@ static bool ls(const char *params[], int n) {
 
     switch (file_type) {
         case FILE_ATTRIBUTE_NORMAL:
-            break;
+            console_println("%s: is a file", params[0]);
+            return false;
         case FILE_ATTRIBUTE_INVALID:
-            break;
+            console_println("%s: is not a file or directory", params[0]);
+            return false;
     }
 
     HANDLE fh;
