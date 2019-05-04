@@ -10,7 +10,7 @@ int trpath(const char *path, const char *cwd, const char *append, char buffer[])
 
     char translated_path[512];
 
-    if (strcmp(path, "/") == 0) {
+    if (strlen(path) >= 1 && path[0] == '/') {
         cwd = NULL;
     }
 

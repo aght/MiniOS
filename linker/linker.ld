@@ -4,7 +4,7 @@ MEMORY
 	ram : ORIGIN = 0x8000, LENGTH = 0x8000000 /* 0x10000000=256MB Half of that is 125MB=0x8000000 */
 }																						
 
-__stack_size__ = DEFINED(__stack_size__) ? __stack_size__ : 0x10000;
+__stack_size__ = DEFINED(__stack_size__) ? __stack_size__ : 0x100000; 
 
 SECTIONS
 {
