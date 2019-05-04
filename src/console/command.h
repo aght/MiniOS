@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 
+#include "../drivers/filesystem/filesystem.h"
 #include "../drivers/sdcard/SDCard.h"
 #include "../coreutils/coreutils.h"
 #include "console.h"

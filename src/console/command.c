@@ -6,11 +6,13 @@
 static bool pwd(const char *params[], int n);
 static bool cd(const char *params[], int n);
 static bool ls(const char *params[], int n);
+static bool cat(const char *params[], int n);
 
 static command_t command_list[] = {
     {"pwd", pwd},
     {"cd", cd},
-    {"ls", ls}};
+    {"ls", ls},
+    {"cat", cat}};
 
 command_t *find_command(const char *str) {
     for (int i = 0; i < sizeof(command_list); i++) {
@@ -76,6 +78,41 @@ static bool ls(const char *params[], int n) {
     sdFindClose(fh);
 
     return true;
+}
+
+static bool cat(const char *params[], int n) {
+    char cwd[512];
+    char path[512];
+    int file_type;
+
+    file_type = trpath(n != 0 ? params[0] : NULL, getcwd(cwd), NULL, path);
+
+    switch (file_type) {
+        case FILE_ATTRIBUTE_DIRECTORY:
+            console_println("%s: is a directory");
+            return false;
+        case FILE_ATTRIBUTE_INVALID:
+            console_println("%s: is not a file or directory");
+            return false;
+    }
+
+    FILE fh;
+    file_t file;
+
+    console_println(path);
+
+    fh = fopen(path);
+
+    if (fread(fh, &file)) {
+        for (int i = 0; i < file.file_size; i++) {
+            console_print("%c", (char)file.bytes[i]);
+        }
+        console_newline();
+    } else {
+        console_println("unable to read file");
+    }
+
+    fclose(fh);
 }
 
 #endif

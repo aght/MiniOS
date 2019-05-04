@@ -19,6 +19,7 @@ Write-Host "Building..."
 	src/drivers/stdio/emb-stdio.c `
   src/drivers/sdcard/SDCard.c `
   src/drivers/smartstart/rpi-SmartStart.c `
+	src/drivers/filesystem/filesystem.c `
 	src/hal/hal.c `
 	src/kernel.c `
 	src/uart/uart.c `
