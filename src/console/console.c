@@ -61,6 +61,10 @@ void console_run() {
                 if (printed_lines.size >= SCREEN_MAX_LINES && status != COMMAND_CLEAR) {
                     redraw();
                 }
+                if (status = COMMAND_CLEAR) {
+                    vector_clearf(&printed_lines);
+                    vector_clear(&printed_buffer);
+                }
                 prompt();
                 vector_clear(&input_buffer);
             } break;
@@ -110,9 +114,26 @@ void chdir(const char *dir) {
 }
 
 void console_clear() {
+    rgb_t color = ascii_colors[16 - 16];
+
     for (uint_fast32_t i = 0; i < SCREEN_HEIGHT; i++) {
-        for (uint_fast32_t j = 0; j < SCREEN_WIDTH; j++) {
-            hal_io_video_put_pixel(j, i, ascii_colors[16 - 16]);
+        for (uint_fast32_t j = 0; j < SCREEN_WIDTH; j += 16) {
+            hal_io_video_put_pixel(j, i, color);
+            hal_io_video_put_pixel(j + 1, i, color);
+            hal_io_video_put_pixel(j + 2, i, color);
+            hal_io_video_put_pixel(j + 3, i, color);
+            hal_io_video_put_pixel(j + 4, i, color);
+            hal_io_video_put_pixel(j + 5, i, color);
+            hal_io_video_put_pixel(j + 6, i, color);
+            hal_io_video_put_pixel(j + 7, i, color);
+            hal_io_video_put_pixel(j + 8, i, color);
+            hal_io_video_put_pixel(j + 9, i, color);
+            hal_io_video_put_pixel(j + 10, i, color);
+            hal_io_video_put_pixel(j + 11, i, color);
+            hal_io_video_put_pixel(j + 12, i, color);
+            hal_io_video_put_pixel(j + 13, i, color);
+            hal_io_video_put_pixel(j + 14, i, color);
+            hal_io_video_put_pixel(j + 15, i, color);
         }
     }
 
