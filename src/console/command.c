@@ -3,12 +3,12 @@
 
 #include "command.h"
 
-static bool pwd(const char *params[], int n);
-static bool cd(const char *params[], int n);
-static bool ls(const char *params[], int n);
-static bool cat(const char *params[], int n);
-static bool hexdump(const char *params[], int n);
-static bool clear(const char* params[], int n);
+static int pwd(const char *params[], int n);
+static int cd(const char *params[], int n);
+static int ls(const char *params[], int n);
+static int cat(const char *params[], int n);
+static int hexdump(const char *params[], int n);
+static int clear(const char* params[], int n);
 
 static command_t command_list[] = {
     {"pwd", pwd},
@@ -28,25 +28,25 @@ command_t *find_command(const char *str) {
     return NULL;
 }
 
-static bool pwd(const char *params[], int n) {
+static int pwd(const char *params[], int n) {
     char cwd[512];
     getcwd(cwd);
     console_println(cwd);
 
-    return true;
+    return COMMAND_SUCCESS;
 }
 
-static bool cd(const char *params[], int n) {
+static int cd(const char *params[], int n) {
     if (n == 0) {
         chdir(NULL);
     } else {
         chdir(params[0]);
     }
 
-    return true;
+    return COMMAND_SUCCESS;
 }
 
-static bool ls(const char *params[], int n) {
+static int ls(const char *params[], int n) {
     char cwd[512];
     char path[512];
     int file_type;
@@ -56,10 +56,10 @@ static bool ls(const char *params[], int n) {
     switch (file_type) {
         case FILE_ATTRIBUTE_NORMAL:
             console_println("%s: is a file", params[0]);
-            return false;
+            return COMMAND_FAILURE;
         case FILE_ATTRIBUTE_INVALID:
             console_println("%s: is not a file or directory", params[0]);
-            return false;
+            return COMMAND_FAILURE;
     }
 
     HANDLE fh;
@@ -81,10 +81,10 @@ static bool ls(const char *params[], int n) {
     } while (sdFindNextFile(fh, &find) != 0);
     sdFindClose(fh);
 
-    return true;
+    return COMMAND_SUCCESS;
 }
 
-static bool cat(const char *params[], int n) {
+static int cat(const char *params[], int n) {
     char cwd[512];
     char path[512];
     int file_type;
@@ -94,10 +94,10 @@ static bool cat(const char *params[], int n) {
     switch (file_type) {
         case FILE_ATTRIBUTE_DIRECTORY:
             console_println("%s: is a directory", path);
-            return false;
+            return COMMAND_FAILURE;
         case FILE_ATTRIBUTE_INVALID:
             console_println("%s: is not a file or directory", path);
-            return false;
+            return COMMAND_FAILURE;
     }
 
     FILE fh;
@@ -117,10 +117,10 @@ static bool cat(const char *params[], int n) {
     fclose(fh);
     free(file.bytes);
 
-    return true;
+    return COMMAND_SUCCESS;
 }
 
-static bool hexdump(const char *params[], int n) {
+static int hexdump(const char *params[], int n) {
     char cwd[512];
     char path[512];
     int file_type;
@@ -130,10 +130,10 @@ static bool hexdump(const char *params[], int n) {
     switch (file_type) {
         case FILE_ATTRIBUTE_DIRECTORY:
             console_println("%s: is a directory", path);
-            return false;
+            return COMMAND_FAILURE;
         case FILE_ATTRIBUTE_INVALID:
             console_println("%s: is not a file or directory", path);
-            return false;
+            return COMMAND_FAILURE;
     }
 
     FILE fh;
@@ -180,18 +180,13 @@ static bool hexdump(const char *params[], int n) {
     fclose(fh);
     free(file.bytes);
 
-    return true;
+    return COMMAND_SUCCESS;
 }
 
-static bool clear(const char* params[], int n) {
-    for (uint_fast32_t i = 0; i < SCREEN_HEIGHT; i++) {
-        for (uint_fast32_t j = 0; j < SCREEN_WIDTH; j++) {
-            hal_io_video_put_pixel(j, i, ascii_colors[16 - 16]);
-        }
-    }
+static int clear(const char* params[], int n) {
+    console_clear();
 
-    hal_io_set_cursor_x(0);
-    hal_io_set_cursor_y(0); 
+    return COMMAND_CLEAR;
 }
 
 #endif

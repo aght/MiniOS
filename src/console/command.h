@@ -10,7 +10,7 @@
 
 typedef struct {
     const char *command;
-    bool (*action)(const char *params[], int n);
+    int (*action)(const char *params[], int n);
 } command_t;
 
 command_t *find_command(const char *command);

@@ -3,12 +3,20 @@
 
 #include "console.h"
 
+#define SCREEN_MAX_LINES SCREEN_HEIGHT / FONT_HEIGHT
+
 #define USERNAME "andy"
 #define HOSTNAME "localhost"
 
 static int vconsole_print(const char *, va_list);
+static int svconsole_print(const char *fmt, va_list args);
+static int sconsole_print(const char *fmt, ...);
+static int sconsole_println(const char *fmt, ...);
+static int sconsole_newline();
+
+static void redraw();
 static void prompt();
-static void run_command(vector *buffer);
+static int run_command(vector *buffer);
 static void input_parse(vector *input, char *buffer[], int *n);
 static int parse_color_escape(const char *str);
 
@@ -18,18 +26,25 @@ typedef struct {
 
 static color_state_t state;
 
-static rgb_t text_color = {255, 255, 255};
-static rgb_t fill_color = {0, 0, 0};
+// For history
+static vector printed_lines;
+static vector printed_buffer;
 
+// For user input
 static vector input_buffer;
+
 static char cwd[512];
 
 void console_init() {
     state.ascii_color = 255;
 
     vector_init(&input_buffer);
+
+    vector_init(&printed_lines);
+    vector_init(&printed_buffer);
+
     hal_io_video_set_brush_color(ascii_colors[state.ascii_color - 16]);
-    hal_io_video_set_fill_color(fill_color);
+
     chdir(NULL);
     prompt();
 }
@@ -40,18 +55,21 @@ void console_run() {
 
         switch (input) {
             case '\n':
-            case '\r':
+            case '\r': {
                 console_newline();
-                run_command(&input_buffer);
+                int status = run_command(&input_buffer);
+                if (printed_lines.size >= SCREEN_MAX_LINES && status != COMMAND_CLEAR) {
+                    redraw();
+                }
                 prompt();
                 vector_clear(&input_buffer);
-                break;
-            case '\b':
+            } break;
+            case '\b': {
                 if (input_buffer.size > 0) {
                     console_print("\b \b");
                     vector_remove(&input_buffer, input_buffer.size - 1);
                 }
-                break;
+            } break;
             default: {
                 console_print("%c", input);
                 vector_add(&input_buffer, input);
@@ -60,7 +78,7 @@ void console_run() {
     }
 }
 
-char* getcwd(char buf[]) {
+char *getcwd(char buf[]) {
     sprintf(buf, cwd);
     return cwd;
 }
@@ -91,11 +109,43 @@ void chdir(const char *dir) {
     }
 }
 
+void console_clear() {
+    for (uint_fast32_t i = 0; i < SCREEN_HEIGHT; i++) {
+        for (uint_fast32_t j = 0; j < SCREEN_WIDTH; j++) {
+            hal_io_video_put_pixel(j, i, ascii_colors[16 - 16]);
+        }
+    }
+
+    hal_io_set_cursor_x(0);
+    hal_io_set_cursor_y(0);
+}
+
+static void redraw() {
+    console_clear();
+
+    // Add 1 to leave room for prompt
+    int offset = printed_lines.size - SCREEN_MAX_LINES + 1;
+
+    for (int i = offset; i < printed_lines.size; i++) {
+        char *line = vector_get(&printed_lines, i);
+        i == printed_lines.size - 1 ? sconsole_println(line) : sconsole_println(line);
+    }
+
+    // TODO: Fix memory leak!
+
+    // for (int i = 0; i < offset; i++) {
+    //     vector_removef(&printed_lines, i);
+    // }
+    // hal_io_serial_puts("Max");
+
+    vector_clear(&printed_buffer);
+}
+
 static void prompt() {
     console_print("\\[034m%s@%s\\[255m:\\[027m%s\\[255m$ ", USERNAME, HOSTNAME, cwd);
 }
 
-static void run_command(vector *buffer) {
+static int run_command(vector *buffer) {
     if (buffer->size == 0) {
         return;
     }
@@ -107,12 +157,19 @@ static void run_command(vector *buffer) {
 
     command_t *cmd = find_command(tokens[0]);
 
+    char inputed_cmd[256];
+    int i = 0;
+    for (; i < buffer->size; i++) {
+        inputed_cmd[i] = vector_get(buffer, i);
+    }
+    inputed_cmd[i] = '\0';
+
     if (!cmd) {
-        console_println("%s: command not found", tokens[0]);
+        console_println("%s: command not found", inputed_cmd);
         return;
     }
 
-    cmd->action(n > 1 ? &tokens[1] : NULL, n - 1);
+    return cmd->action(n > 1 ? &tokens[1] : NULL, n - 1);
 }
 
 static void input_parse(vector *input, char *buffer[], int *n) {
@@ -173,13 +230,31 @@ static int vconsole_print(const char *fmt, va_list args) {
     printed = vsprintf(printf_buf, fmt, args);
 
     for (int i = 0; i < printed; i++) {
+        if (printf_buf[i] != '\n') {
+            vector_add(&printed_buffer, printf_buf[i]);
+        } else {
+            int j = 0;
+            char *printed_str;
 
+            printed_str = (char *)malloc(sizeof(char) * printed_buffer.size + 1);
+
+            for (j = 0; j < printed_buffer.size; j++) {
+                printed_str[j] = vector_get(&printed_buffer, j);
+            }
+            printed_str[j] = '\0';
+
+            vector_add(&printed_lines, printed_str);
+            vector_clear(&printed_buffer);
+        }
+    }
+
+    for (int i = 0; i < printed; i++) {
         if (printf_buf[i] == '\\') {
-            int status = parse_color_escape(&printf_buf[i]);
+            int shift = parse_color_escape(&printf_buf[i]);
 
             hal_io_video_set_brush_color(ascii_colors[state.ascii_color - 16]);
-            if (status != 0) {
-                i += status;
+            if (shift != 0) {
+                i += shift;
             }
         }
 
@@ -216,6 +291,56 @@ int console_println(const char *fmt, ...) {
 
 int console_newline() {
     return console_print("%c", '\n');
+}
+
+static int svconsole_print(const char *fmt, va_list args) {
+    char printf_buf[512];
+    int printed = 0;
+
+    printed = vsprintf(printf_buf, fmt, args);
+
+    for (int i = 0; i < printed; i++) {
+        if (printf_buf[i] == '\\') {
+            int shift = parse_color_escape(&printf_buf[i]);
+
+            hal_io_video_set_brush_color(ascii_colors[state.ascii_color - 16]);
+            if (shift != 0) {
+                i += shift;
+            }
+        }
+
+        hal_io_video_putc(printf_buf[i]);
+    }
+
+    hal_io_video_set_brush_color(ascii_colors[255 - 16]);
+
+    return printed;
+}
+
+static int sconsole_print(const char *fmt, ...) {
+    va_list args;
+    int printed = 0;
+
+    va_start(args, fmt);
+    printed = svconsole_print(fmt, args);
+    va_end(args);
+
+    return printed;
+}
+
+static int sconsole_println(const char *fmt, ...) {
+    va_list args;
+    int printed = 0;
+
+    va_start(args, fmt);
+    printed = svconsole_print(fmt, args);
+    va_end(args);
+
+    return printed + sconsole_print("%c", '\n');
+}
+
+static int sconsole_newline() {
+    return sconsole_print("%c", '\n');
 }
 
 #endif

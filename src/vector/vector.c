@@ -99,6 +99,16 @@ bool vector_remove(vector *v, size_t index) {
     return true;
 }
 
+bool vector_removef(vector* v, size_t index) {
+    int success = vector_remove(v, index);
+    
+    if (success) {
+        free(v->data[index]);
+    }
+
+    return success;
+}
+
 void *vector_get(vector *v, size_t index) {
     if (!index_in_range(v, index)) {
         return NULL;
@@ -220,6 +230,11 @@ void vector_add_all(vector *dest, vector *src) {
 
 void vector_clear(vector *v) {
     vector_destroy(v);
+    vector_init(v);
+}
+
+void vector_clearf(vector *v) {
+    vector_destroyf(v);
     vector_init(v);
 }
 

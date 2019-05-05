@@ -4,7 +4,7 @@
 #include "../uart/uart.h"
 #include "hal.h"
 
-static uint32_t x_y_to_raw(uint32_t, uint32_t);
+static uint_fast32_t x_y_to_raw(uint_fast32_t, uint_fast32_t);
 static uint32_t rgb_to_hex(rgb_t);
 
 static uint32_t cursorX = 0;
@@ -102,11 +102,11 @@ void hal_io_video_putc(uint8_t c) {
     }
 }
 
-void hal_io_video_put_pixel(uint32_t x, uint32_t y, rgb_t color) {
+void hal_io_video_put_pixel(uint_fast32_t x, uint_fast32_t y, rgb_t color) {
     hal_io_video_put_pixel_raw(x_y_to_raw(x, y), rgb_to_hex(color));
 }
 
-static uint32_t x_y_to_raw(uint32_t x, uint32_t y) {
+static uint_fast32_t x_y_to_raw(uint_fast32_t x, uint_fast32_t y) {
     return y * (3 * SCREEN_WIDTH) + 3 * x;
 }
 
