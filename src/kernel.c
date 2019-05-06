@@ -12,6 +12,7 @@
 void main(void) {
     hal_io_video_init();
     hal_io_serial_init();
+    ARM_setmaxspeed(NULL);
     sdInitCard(NULL, NULL, true);
     console_init();
 

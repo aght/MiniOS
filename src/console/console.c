@@ -58,13 +58,15 @@ void console_run() {
             case '\r': {
                 console_newline();
                 int status = run_command(&input_buffer);
+
                 if (printed_lines.size >= SCREEN_MAX_LINES && status != COMMAND_CLEAR) {
                     redraw();
                 }
-                if (status = COMMAND_CLEAR) {
+
+                if (status == COMMAND_CLEAR) {
                     vector_clearf(&printed_lines);
-                    vector_clear(&printed_buffer);
                 }
+                
                 prompt();
                 vector_clear(&input_buffer);
             } break;
@@ -117,23 +119,8 @@ void console_clear() {
     rgb_t color = ascii_colors[16 - 16];
 
     for (uint_fast32_t i = 0; i < SCREEN_HEIGHT; i++) {
-        for (uint_fast32_t j = 0; j < SCREEN_WIDTH; j += 16) {
+        for (uint_fast32_t j = 0; j < SCREEN_WIDTH; j ++) {
             hal_io_video_put_pixel(j, i, color);
-            hal_io_video_put_pixel(j + 1, i, color);
-            hal_io_video_put_pixel(j + 2, i, color);
-            hal_io_video_put_pixel(j + 3, i, color);
-            hal_io_video_put_pixel(j + 4, i, color);
-            hal_io_video_put_pixel(j + 5, i, color);
-            hal_io_video_put_pixel(j + 6, i, color);
-            hal_io_video_put_pixel(j + 7, i, color);
-            hal_io_video_put_pixel(j + 8, i, color);
-            hal_io_video_put_pixel(j + 9, i, color);
-            hal_io_video_put_pixel(j + 10, i, color);
-            hal_io_video_put_pixel(j + 11, i, color);
-            hal_io_video_put_pixel(j + 12, i, color);
-            hal_io_video_put_pixel(j + 13, i, color);
-            hal_io_video_put_pixel(j + 14, i, color);
-            hal_io_video_put_pixel(j + 15, i, color);
         }
     }
 
@@ -147,17 +134,14 @@ static void redraw() {
     // Add 1 to leave room for prompt
     int offset = printed_lines.size - SCREEN_MAX_LINES + 1;
 
-    for (int i = offset; i < printed_lines.size; i++) {
+    for (int i = offset - 1; i >= 0; i--) {
+        vector_remove(&printed_lines, i);
+    }
+
+    for (int i = 0; i < printed_lines.size; i++) {
         char *line = vector_get(&printed_lines, i);
         i == printed_lines.size - 1 ? sconsole_println(line) : sconsole_println(line);
     }
-
-    // TODO: Fix memory leak!
-
-    // for (int i = 0; i < offset; i++) {
-    //     vector_removef(&printed_lines, i);
-    // }
-    // hal_io_serial_puts("Max");
 
     vector_clear(&printed_buffer);
 }
@@ -253,6 +237,11 @@ static int vconsole_print(const char *fmt, va_list args) {
     for (int i = 0; i < printed; i++) {
         if (printf_buf[i] != '\n') {
             vector_add(&printed_buffer, printf_buf[i]);
+
+            if (printed_lines.size > 2 * SCREEN_MAX_LINES) {
+                redraw();
+            }
+
         } else {
             int j = 0;
             char *printed_str;
