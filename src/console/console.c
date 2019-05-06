@@ -263,6 +263,7 @@ static int vconsole_print(const char *fmt, va_list args) {
             int shift = parse_color_escape(&printf_buf[i]);
 
             hal_io_video_set_brush_color(ascii_colors[state.ascii_color - 16]);
+            
             if (shift != 0) {
                 i += shift;
             }
