@@ -4,6 +4,8 @@
 .equ INIT_FAILED, 1
 .equ INIT_SUCCESS, 0
 
+.globl frame_buffer_ptr 
+
 /*
 *   HAL IO Video Init
 *
@@ -131,16 +133,13 @@ mb0_c8_read:
 
 @ raspi mailbox requests, must be padded to 16 bytes
 .align 4
-vc_set_res:  .word 100, 0                      @ total size, code (0=req)
+vc_set_res:  .word 80, 0                      @ total size, code (0=req)
              .word 0x00048003, 8, 8, 640, 480 @ set physical size (640x480)
              .word 0x00048004, 8, 8, 640, 480 @ set virtual size (640x480)
-             .word 0x00048005, 4, 4, 16       @ set depth (24-bit)
+             .word 0x00048005, 4, 4, 24       @ set depth (24-bit)
              .word 0, 0, 0, 0                 @ end tag & padding
 
 vc_alloc_fb: .word 32, 0                      @ total size, code (0=req)
              .word 0x00040001, 8, 4, 16, 0    @ allocate framebuffer
              .word 0                          @ end tag & padding
-
-
-
-frame_buffer_ptr:  .word 0
+             

@@ -5,12 +5,14 @@
 #include "hal.h"
 
 static uint_fast32_t x_y_to_raw(uint_fast32_t, uint_fast32_t);
-static uint16_t rgb_to_hex(rgb_t);
+static uint32_t rgb_to_hex(rgb_t);
 
 static uint32_t cursorX = 0;
 static uint32_t cursorY = 0;
 static rgb_t brush_color = {255, 255, 255};
 static rgb_t fill_color = {0, 0, 0};
+
+uint32_t *frame_buffer_ptr;
 
 uint32_t hal_io_get_cursor_x() {
     return cursorX;
@@ -107,10 +109,19 @@ void hal_io_video_put_pixel(uint_fast32_t x, uint_fast32_t y, rgb_t color) {
 }
 
 static uint_fast32_t x_y_to_raw(uint_fast32_t x, uint_fast32_t y) {
-    return y * (2 * SCREEN_WIDTH) + 2 * x;
+    return y * (3 * SCREEN_WIDTH) + 3 * x;
 }
 
-static uint16_t rgb_to_hex(rgb_t color) {
-    // return ((color.b & 0xff) << 16) + ((color.g & 0xff) << 8) + (color.r & 0xff);
-    return ((color.r & 0b11111000) << 8) | ((color.g & 0b11111100) << 3) | (color.b >> 3);
+static uint32_t rgb_to_hex(rgb_t color) {
+    return ((color.b & 0xff) << 16) + ((color.g & 0xff) << 8) + (color.r & 0xff);
+    // return ((color.r & 0b11111000) << 8) | ((color.g & 0b11111100) << 3) | (color.b >> 3);
+}
+
+void hal_io_video_clear() {
+    uint32_t *ptr = frame_buffer_ptr;
+
+    for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++) {
+        *ptr = 0;
+        ptr++;
+    }
 }

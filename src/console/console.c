@@ -116,13 +116,7 @@ void chdir(const char *dir) {
 }
 
 void console_clear() {
-    rgb_t color = ascii_colors[16 - 16];
-
-    for (uint_fast32_t i = 0; i < SCREEN_HEIGHT; i++) {
-        for (uint_fast32_t j = 0; j < SCREEN_WIDTH; j ++) {
-            hal_io_video_put_pixel(j, i, color);
-        }
-    }
+    hal_io_video_clear();
 
     hal_io_set_cursor_x(0);
     hal_io_set_cursor_y(0);
@@ -238,7 +232,7 @@ static int vconsole_print(const char *fmt, va_list args) {
         if (printf_buf[i] != '\n') {
             vector_add(&printed_buffer, printf_buf[i]);
 
-            if (printed_lines.size > 1.5 * SCREEN_MAX_LINES) {
+            if (printed_lines.size > 2 * SCREEN_MAX_LINES) {
                 redraw();
             }
 
