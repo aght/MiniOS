@@ -134,7 +134,7 @@ mb0_c8_read:
 vc_set_res:  .word 100, 0                      @ total size, code (0=req)
              .word 0x00048003, 8, 8, 640, 480 @ set physical size (640x480)
              .word 0x00048004, 8, 8, 640, 480 @ set virtual size (640x480)
-             .word 0x00048005, 4, 4, 24       @ set depth (24-bit)
+             .word 0x00048005, 4, 4, 16       @ set depth (24-bit)
              .word 0, 0, 0, 0                 @ end tag & padding
 
 vc_alloc_fb: .word 32, 0                      @ total size, code (0=req)

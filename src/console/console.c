@@ -66,7 +66,7 @@ void console_run() {
                 if (status == COMMAND_CLEAR) {
                     vector_clearf(&printed_lines);
                 }
-                
+
                 prompt();
                 vector_clear(&input_buffer);
             } break;
@@ -238,7 +238,7 @@ static int vconsole_print(const char *fmt, va_list args) {
         if (printf_buf[i] != '\n') {
             vector_add(&printed_buffer, printf_buf[i]);
 
-            if (printed_lines.size > 2 * SCREEN_MAX_LINES) {
+            if (printed_lines.size > 1.5 * SCREEN_MAX_LINES) {
                 redraw();
             }
 
