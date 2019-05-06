@@ -8,7 +8,7 @@ static int cd(const char *params[], int n);
 static int ls(const char *params[], int n);
 static int cat(const char *params[], int n);
 static int hexdump(const char *params[], int n);
-static int clear(const char* params[], int n);
+static int clear(const char *params[], int n);
 
 static command_t command_list[] = {
     {"pwd", pwd},
@@ -89,6 +89,10 @@ static int cat(const char *params[], int n) {
     char path[512];
     int file_type;
 
+    if (n == 0) {
+        return COMMAND_FAILURE;
+    }
+
     file_type = trpath(n != 0 ? params[0] : NULL, getcwd(cwd), NULL, path);
 
     switch (file_type) {
@@ -124,6 +128,10 @@ static int hexdump(const char *params[], int n) {
     char cwd[512];
     char path[512];
     int file_type;
+
+    if (n == 0) {
+        return COMMAND_FAILURE;
+    }
 
     file_type = trpath(n != 0 ? params[0] : NULL, getcwd(cwd), NULL, path);
 
@@ -183,7 +191,7 @@ static int hexdump(const char *params[], int n) {
     return COMMAND_SUCCESS;
 }
 
-static int clear(const char* params[], int n) {
+static int clear(const char *params[], int n) {
     console_clear();
 
     return COMMAND_CLEAR;

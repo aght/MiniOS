@@ -17,7 +17,7 @@ static int sconsole_newline();
 static void redraw();
 static void prompt();
 static int run_command(vector *buffer);
-static void input_parse(vector *input, char *buffer[], int *n);
+static int input_parse(vector *input, char *buffer[]);
 static int parse_color_escape(const char *str);
 
 typedef struct {
@@ -150,9 +150,8 @@ static int run_command(vector *buffer) {
     }
 
     char *tokens[256];
-    int n;
-
-    input_parse(buffer, tokens, &n);
+    
+    int n = input_parse(buffer, tokens);
 
     command_t *cmd = find_command(tokens[0]);
 
@@ -171,7 +170,7 @@ static int run_command(vector *buffer) {
     return cmd->action(n > 1 ? &tokens[1] : NULL, n - 1);
 }
 
-static void input_parse(vector *input, char *buffer[], int *n) {
+static int input_parse(vector *input, char *buffer[]) {
     char str[input->size + 1];
 
     int i;
@@ -189,7 +188,7 @@ static void input_parse(vector *input, char *buffer[], int *n) {
         buffer[j++] = token;
     }
 
-    *n = --j;
+    return --j;
 }
 
 static int parse_color_escape(const char *str) {
