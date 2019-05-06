@@ -24,7 +24,7 @@ void hal_io_set_cursor_y(uint32_t);
 uint32_t hal_io_video_init(void);
 void hal_io_video_puts(uint8_t *);
 void hal_io_video_putc(uint8_t);
-void hal_io_video_put_pixel(uint32_t, uint32_t, rgb_t);
+void hal_io_video_put_pixel(uint_fast32_t, uint_fast32_t, rgb_t);
 
 void hal_io_video_set_brush_color(rgb_t);
 void hal_io_video_set_fill_color(rgb_t);

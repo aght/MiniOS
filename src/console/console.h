@@ -12,11 +12,16 @@
 #include "command.h"
 #include "ascii_colors.h"
 
+#define COMMAND_SUCCESS 0x2
+#define COMMAND_CLEAR 0x4
+#define COMMAND_FAILURE 0x8
+
 void console_init();
 void console_run();
 
 char* getcwd(char buf[]);
 void chdir(const char *dir);
+void console_clear();
 
 int console_print(const char *fmt, ...);
 int console_println(const char *fmt, ...);

@@ -1,11 +1,4 @@
 /*
-*   Modified this code from Leon de Boer (see below), but there was no
-*   copyright for this file, so I copy-pasted one from a different file
-*
-*   Rafael Roman Otero
-*/
-
-/*
 {***************[ THIS CODE IS FREEWARE UNDER CC Attribution]***************}
 {																                                            }
 {     This sourcecode is released for the purpose to promote programming    }

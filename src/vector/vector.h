@@ -19,6 +19,7 @@ void vector_destroyf(vector*);
 bool vector_add(vector*, void*);
 bool vector_insert(vector*, size_t, void*);
 bool vector_remove(vector*, size_t);
+bool vector_removef(vector*, size_t);
 
 void* vector_get(vector*, size_t);
 bool vector_set(vector*, size_t, void*);
@@ -38,6 +39,7 @@ void vector_reverse(vector*);
 void vector_add_all(vector*, vector*);
 
 void vector_clear(vector*);
+void vector_clearf(vector*);
 bool vector_is_empty(vector*);
 
 void* vector_bsearch(vector*, int (*)(const void*, const void*), void*);

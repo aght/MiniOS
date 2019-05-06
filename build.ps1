@@ -7,6 +7,8 @@ Write-Host "Building..."
 
 & arm-none-eabi-gcc.exe `
 	-w `
+	-mfpu=neon-vfpv4 `
+	-march=armv7-a `
 	-mcpu=cortex-a7 `
 	-fpic `
 	-ffreestanding `
@@ -31,7 +33,7 @@ Write-Host "Building..."
 	src/vector/vector.c `
 	src/utils/strutils.c `
   -o build/kernel.elf `
-	-O0	`
+	-O0 `
 	-lc -lm -lg -lgcc
 
 	# arm-none-eabi-objdump -D .\output\kernel.elf | Out-File -filepath output/kernel.lss -Encoding ASCII

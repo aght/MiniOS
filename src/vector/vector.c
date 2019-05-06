@@ -73,7 +73,7 @@ bool vector_insert(vector *v, size_t index, void *e) {
     }
 
     vector_set(v, index, e);
-    
+
     for (int i = 0, k = index + 1; i < tmp.size; i++, k++) {
         if (k < v->size) {
             vector_set(v, k, vector_get(&tmp, i));
@@ -92,11 +92,25 @@ bool vector_remove(vector *v, size_t index) {
         return false;
     }
 
-    memcpy(&v->data[index], &v->data[index + 1], (v->capacity - index) * sizeof(void *));
+    for (int i = index, j = index + 1; i < v->size; i++, j++) {
+        if (index_in_range(v, j)) {
+            v->data[i] = v->data[j];
+        }
+    }
 
     v->size--;
 
     return true;
+}
+
+bool vector_removef(vector *v, size_t index) {
+    if (!index_in_range(v, index)) {
+        return false;
+    }
+
+    free(v->data[index]);
+
+    return vector_remove(v, index);
 }
 
 void *vector_get(vector *v, size_t index) {
@@ -220,6 +234,11 @@ void vector_add_all(vector *dest, vector *src) {
 
 void vector_clear(vector *v) {
     vector_destroy(v);
+    vector_init(v);
+}
+
+void vector_clearf(vector *v) {
+    vector_destroyf(v);
     vector_init(v);
 }
 

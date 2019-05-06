@@ -1,12 +1,3 @@
-/*
-	A simple bootloader for ARMv8
-
-  Started off from hte bootloader here:
-      https://github.com/mmuszkow/NoOsBootstrap/tree/master/arm
-
-	Rafael R.O.
-*/
-
 .section ".boot"
 .globl _bootloader
 .align 2
@@ -74,19 +65,8 @@ halt:						/* Kernel should not return, but in case it does */
     wfe @ low-power mode
     b halt
 
-/*
-	         V E C T O R     T A B L E
-*/
-
 hang:
 		b hang
-
-/* IRQ Handler as per documentation*/
-/* irq:
-	 	push {r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,lr}
-		bl IRQ_Handler
-		pop  {r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,lr}
-		subs pc,lr,#4 */
 
 .balign 32
 vector:
