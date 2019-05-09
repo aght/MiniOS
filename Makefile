@@ -2,7 +2,7 @@ ifeq ($(shell echo $$OS),$$OS)
 	MAKEDIR = if not exist "$(1)" mkdir "$(1)"
 	RM = rmdir /S /Q "$(1)"
 
-	# Will not work with '/' beacuse Windows
+	# Will not work with '/' beacause Windows
 	FIND = dir /a-D /S /B "$(1)"
 else
 	MAKEDIR = '$(SHELL)' -c "mkdir -p \"$(1)\""
