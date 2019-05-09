@@ -139,6 +139,8 @@ static int run_program(char *tokens[], int n) {
         uint8_t bytes = file.bytes;
 
         int result = ((int (*)(void))(file.bytes))();
+
+        console_println("program exited with status: %d", result);
     } else {
         return COMMAND_FAILURE;
     }
