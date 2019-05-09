@@ -1,18 +1,8 @@
-# Used to override make using cygwin's /bin/sh
-# Should be removed if your not using Windows
 SHELL = cmd
 
-ifeq ($(shell echo $$OS),$$OS)
-	MAKEDIR = if not exist "$(1)" mkdir "$(1)"
-	RM = rmdir /S /Q "$(1)"
-
-	# Will not work with '/' beacause Windows
-	FIND = dir /a-D /S /B "$(1)"
-else
-	MAKEDIR = '$(SHELL)' -c "mkdir -p \"$(1)\""
-	RM = '$(SHELL)' -c "rm -rf \"$(1)\""
-	FIND = '$(SHELL)' -c "find -iname \"$(1)\""
-endif
+MAKEDIR = if not exist "$(1)" mkdir "$(1)"
+RM = rmdir /S /Q "$(1)"
+FIND = dir /a-D /S /B "$(1)"
 
 .PHONY: all
 all: build run
@@ -34,8 +24,8 @@ CC = arm-none-eabi-gcc.exe
 
 PROJECT = MiniOS
 
-CSOURCE = $(shell $(call FIND,*.c))
-ASMSOURCE = $(shell $(call FIND,*.S))
+CSOURCE = $(shell $(call FIND,src\*.c))
+ASMSOURCE = $(shell $(call FIND,src\*.S))
 
 LINKERFILE = linker/linker.ld
 
