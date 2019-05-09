@@ -129,11 +129,8 @@ static int run_program(char *tokens[], int n) {
 
     int type = realpath_n(tokens[0], resolved_path);
 
-    switch (type) {
-        case FILE_ATTRIBUTE_DIRECTORY:
-            return COMMAND_FAILURE;
-        case FILE_ATTRIBUTE_INVALID:
-            return COMMAND_FAILURE;
+    if (type != FILE_ATTRIBUTE_NORMAL) {
+        return COMMAND_FAILURE;
     }
 
     fh = fopen(tokens[0]);
@@ -153,24 +150,18 @@ static int run_program(char *tokens[], int n) {
 }
 
 static int parse_input(vector *input, char *buffer[]) {
-    char str[input->size + 1];
-
     int i;
-    for (i = 0; i < input->size; i++) {
-        str[i] = vector_get(input, i);
-    }
-    str[i] = '\0';
+    char *token;
+    char str[256];
 
-    int j = 0;
+    vtostr(input, str);
 
-    char *token = strtok(str, " ");
-    buffer[j++] = token;
-    while (token) {
-        token = strtok(NULL, " ");
-        buffer[j++] = token;
+    for (i = 0; token != NULL; i++) {
+        token = strtok(i == 0 ? str : NULL, " ");
+        buffer[i] = token;
     }
 
-    return --j;
+    return i;
 }
 
 char *getcwd(char buf[]) {
