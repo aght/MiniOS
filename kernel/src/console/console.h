@@ -15,6 +15,7 @@
 #define COMMAND_SUCCESS 0x2
 #define COMMAND_CLEAR 0x4
 #define COMMAND_FAILURE 0x8
+#define COMMAND_NOT_FOUND 0x10
 
 void console_init();
 void console_run();

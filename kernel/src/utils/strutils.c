@@ -32,6 +32,33 @@ int strreplc(char *str, char oldc, char newc) {
 
     return n;
 }
-    
+
+char *vtostr(vector *vec, char buffer[]) {
+    if (!vec) {
+        return NULL;
+    }
+
+    int j;
+    for (j = 0; j < vec->size; j++) {
+        buffer[j] = vector_get(vec, j);
+    }
+    buffer[j] = '\0';
+
+    return buffer;
+}
+
+int vstrrcc(vector *str, char c) {
+    int n = 0;
+
+    for (int i = str->size - 1; i >= 0; i--) {
+        if (vector_get(str, i) == c) {
+            n++;
+        } else {
+            return n;
+        }
+    }
+
+    return n;
+}
 
 #endif

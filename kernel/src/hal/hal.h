@@ -36,4 +36,6 @@ uint8_t hal_io_serial_getc();
 
 void hal_io_video_put_pixel_raw(uint32_t, uint32_t);
 
+void hal_io_video_clear();
+
 #endif

@@ -10,14 +10,18 @@
 
 static int vconsole_print(const char *, va_list);
 static int svconsole_print(const char *fmt, va_list args);
+
 static int sconsole_print(const char *fmt, ...);
 static int sconsole_println(const char *fmt, ...);
 static int sconsole_newline();
 
+static int execute_input(vector *buffer);
+static int run_program(char *tokens[], int n);
+static int run_command(char *tokens[], int n);
+
 static void redraw();
 static void prompt();
-static int run_command(vector *buffer);
-static void input_parse(vector *input, char *buffer[], int *n);
+static int parse_input(vector *input, char *buffer[]);
 static int parse_color_escape(const char *str);
 
 typedef struct {
@@ -57,7 +61,7 @@ void console_run() {
             case '\n':
             case '\r': {
                 console_newline();
-                int status = run_command(&input_buffer);
+                int status = execute_input(&input_buffer);
 
                 if (printed_lines.size >= SCREEN_MAX_LINES && status != COMMAND_CLEAR) {
                     redraw();
@@ -66,7 +70,7 @@ void console_run() {
                 if (status == COMMAND_CLEAR) {
                     vector_clearf(&printed_lines);
                 }
-                
+
                 prompt();
                 vector_clear(&input_buffer);
             } break;
@@ -82,6 +86,84 @@ void console_run() {
             }
         }
     }
+}
+
+static int execute_input(vector *buffer) {
+    int n;
+    int status;
+    char *tokens[256];
+
+    if (buffer->size == 0) {
+        return COMMAND_FAILURE;
+    }
+
+    n = parse_input(buffer, tokens);
+
+    status = run_command(tokens, n);
+
+    if (status == COMMAND_NOT_FOUND) {
+        status = run_program(tokens, n);
+
+        if (status != COMMAND_SUCCESS) {
+            console_println("%s: command not found", tokens[0]);
+        }
+    } else {
+        return status;
+    }
+}
+
+static int run_command(char *tokens[], int n) {
+    command_t *cmd = find_command(tokens[0]);
+
+    if (!cmd) {
+        return COMMAND_NOT_FOUND;
+    }
+
+    return cmd->action(n > 1 ? &tokens[1] : NULL, n - 1);
+}
+
+static int run_program(char *tokens[], int n) {
+    FILE fh;
+    file_t file;
+    char resolved_path[512];
+
+    int type = realpath_n(tokens[0], resolved_path);
+
+    if (type != FILE_ATTRIBUTE_NORMAL) {
+        return COMMAND_FAILURE;
+    }
+
+    fh = fopen(tokens[0]);
+
+    if (fread(fh, &file)) {
+        uint8_t bytes = file.bytes;
+
+        int result = ((int (*)(void))(file.bytes))();
+
+        console_println("program exited with status: %d", result);
+    } else {
+        return COMMAND_FAILURE;
+    }
+
+    fclose(fh);
+    free(file.bytes);
+
+    return COMMAND_SUCCESS;
+}
+
+static int parse_input(vector *input, char *buffer[]) {
+    int i;
+    char *token;
+    char str[256];
+
+    vtostr(input, str);
+
+    for (i = 0; token != NULL; i++) {
+        token = strtok(i == 0 ? str : NULL, " ");
+        buffer[i] = token;
+    }
+
+    return i;
 }
 
 char *getcwd(char buf[]) {
@@ -116,13 +198,7 @@ void chdir(const char *dir) {
 }
 
 void console_clear() {
-    rgb_t color = ascii_colors[16 - 16];
-
-    for (uint_fast32_t i = 0; i < SCREEN_HEIGHT; i++) {
-        for (uint_fast32_t j = 0; j < SCREEN_WIDTH; j ++) {
-            hal_io_video_put_pixel(j, i, color);
-        }
-    }
+    hal_io_video_clear();
 
     hal_io_set_cursor_x(0);
     hal_io_set_cursor_y(0);
@@ -148,54 +224,6 @@ static void redraw() {
 
 static void prompt() {
     console_print("\\[034m%s@%s\\[255m:\\[027m%s\\[255m$ ", USERNAME, HOSTNAME, cwd);
-}
-
-static int run_command(vector *buffer) {
-    if (buffer->size == 0) {
-        return;
-    }
-
-    char *tokens[256];
-    int n;
-
-    input_parse(buffer, tokens, &n);
-
-    command_t *cmd = find_command(tokens[0]);
-
-    char inputed_cmd[256];
-    int i = 0;
-    for (; i < buffer->size; i++) {
-        inputed_cmd[i] = vector_get(buffer, i);
-    }
-    inputed_cmd[i] = '\0';
-
-    if (!cmd) {
-        console_println("%s: command not found", inputed_cmd);
-        return;
-    }
-
-    return cmd->action(n > 1 ? &tokens[1] : NULL, n - 1);
-}
-
-static void input_parse(vector *input, char *buffer[], int *n) {
-    char str[input->size + 1];
-
-    int i;
-    for (i = 0; i < input->size; i++) {
-        str[i] = vector_get(input, i);
-    }
-    str[i] = '\0';
-
-    int j = 0;
-
-    char *token = strtok(str, " ");
-    buffer[j++] = token;
-    while (token) {
-        token = strtok(NULL, " ");
-        buffer[j++] = token;
-    }
-
-    *n = --j;
 }
 
 static int parse_color_escape(const char *str) {
@@ -263,6 +291,7 @@ static int vconsole_print(const char *fmt, va_list args) {
             int shift = parse_color_escape(&printf_buf[i]);
 
             hal_io_video_set_brush_color(ascii_colors[state.ascii_color - 16]);
+
             if (shift != 0) {
                 i += shift;
             }

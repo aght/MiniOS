@@ -48,20 +48,6 @@ static void tokenize(vector *v, char delim, vector *tokens) {
     }
 }
 
-static int vstrrcc(vector *str, char c) {
-    int n = 0;
-
-    for (int i = str->size - 1; i >= 0; i--) {
-        if (vector_get(str, i) == c) {
-            n++;
-        } else {
-            return n;
-        }
-    }
-
-    return n;
-}
-
 static void resolve_symbols(vector *tokens) {
     for (int i = 0; i < tokens->size; i++) {
         vector *str = vector_get(tokens, i);
@@ -97,20 +83,6 @@ static bool m_strcmp(vector *a, const char *b) {
     }
 
     return true;
-}
-
-static char *vtostr(vector *vec, char buffer[]) {
-    if (!vec) {
-        return NULL;
-    }
-
-    int j;
-    for (j = 0; j < vec->size; j++) {
-        buffer[j] = vector_get(vec, j);
-    }
-    buffer[j] = '\0';
-
-    return buffer;
 }
 
 static int build_path(vector *tokens, char *buffer) {
