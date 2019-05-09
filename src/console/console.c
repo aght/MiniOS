@@ -102,10 +102,14 @@ static int execute_input(vector *buffer) {
     status = run_command(tokens, n);
 
     if (status == COMMAND_NOT_FOUND) {
-        console_println("%s: command not found", tokens[0]);
-    }
+        status = run_program(tokens, n);
 
-    // run_program(tokens, n);
+        if (status != COMMAND_SUCCESS) {
+            console_println("%s: command not found", tokens[0]);
+        }
+    } else {
+        return status;
+    }
 }
 
 static int run_command(char *tokens[], int n) {
@@ -138,13 +142,14 @@ static int run_program(char *tokens[], int n) {
         uint8_t bytes = file.bytes;
 
         int result = ((int (*)(void))(file.bytes))();
-
     } else {
         return COMMAND_FAILURE;
     }
 
     fclose(fh);
     free(file.bytes);
+
+    return COMMAND_SUCCESS;
 }
 
 static int parse_input(vector *input, char *buffer[]) {
