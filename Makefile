@@ -1,3 +1,7 @@
+# Used to override make using cygwin's /bin/sh
+# Should be removed if your not using Windows
+SHELL = cmd
+
 ifeq ($(shell echo $$OS),$$OS)
 	MAKEDIR = if not exist "$(1)" mkdir "$(1)"
 	RM = rmdir /S /Q "$(1)"
