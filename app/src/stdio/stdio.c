@@ -1,28 +1,9 @@
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
-{																			}
-{       Copyright(c): Leon de Boer(LdB) 2017								}
-{       Version: 2.02														}
-{																			}
-{***************[ THIS CODE IS FREEWARE UNDER CC Attribution]***************}
-{																            }
-{     This sourcecode is released for the purpose to promote programming    }
-{  on the Raspberry Pi. You may redistribute it and/or modify with the      }
-{  following disclaimer and condition.                                      }
-{																            }
-{      The SOURCE CODE is distributed "AS IS" WITHOUT WARRANTIES AS TO      }
-{   PERFORMANCE OF MERCHANTABILITY WHETHER EXPRESSED OR IMPLIED.            }
-{   Redistributions of source code must retain the copyright notices to     }
-{   maintain the author credit (attribution) .								}
-{																			}
-{***************************************************************************}*/
-
 #include <stdint.h>     // uint_x Types
 #include <stdarg.h>			// Varadic arguments
 #include <ctype.h>			// isdigit etc
 #include <string.h>			// strnlen used
 
-#include "emb-stdio.h"			// This units header
-#include "../../hal/hal.h"
+#include "stdio.h"
 
 static int skip_atoi(const char **s)
 {
@@ -316,7 +297,7 @@ int printf(const char *fmt, ...)
 	va_end(args);
 
 	for (int i = 0; i < printed; i++){
-		hal_io_serial_putc(printf_buf[i]);
+		putc(printf_buf[i]);
 	}
 
 	return printed;

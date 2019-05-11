@@ -107,6 +107,8 @@ static int execute_input(vector *buffer) {
 
         if (status != COMMAND_SUCCESS) {
             console_println("%s: command not found", tokens[0]);
+        } else {
+            console_newline();
         }
     } else {
         return status;
@@ -147,9 +149,8 @@ static int run_program(char *tokens[], int n) {
     if (fread(fh, &file)) {
         uint8_t bytes = file.bytes;
 
+        // result is unused for now
         int result = ((int (*)(void))(file.bytes))();
-
-        console_println("program exited with status: %d", result);
     } else {
         return COMMAND_FAILURE;
     }
