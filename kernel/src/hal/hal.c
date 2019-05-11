@@ -106,6 +106,7 @@ void hal_io_video_putc(uint8_t c) {
 
 void hal_io_video_put_pixel(uint_fast32_t x, uint_fast32_t y, rgb_t color) {
     hal_io_video_put_pixel_raw(x_y_to_raw(x, y), rgb_to_hex(color));
+    // frame_buffer_ptr[x_y_to_raw(x, y)] = rgb_to_hex(color);
 }
 
 static uint_fast32_t x_y_to_raw(uint_fast32_t x, uint_fast32_t y) {

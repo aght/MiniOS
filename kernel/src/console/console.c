@@ -88,6 +88,7 @@ void console_run() {
     }
 }
 
+// Broken, cannot use cat n two or more times
 static int execute_input(vector *buffer) {
     int n;
     int status;
@@ -113,6 +114,10 @@ static int execute_input(vector *buffer) {
 }
 
 static int run_command(char *tokens[], int n) {
+    if (n == 0) {
+        return COMMAND_NOT_FOUND;
+    }
+
     command_t *cmd = find_command(tokens[0]);
 
     if (!cmd) {
@@ -123,6 +128,10 @@ static int run_command(char *tokens[], int n) {
 }
 
 static int run_program(char *tokens[], int n) {
+    if (n == 0) {
+        return COMMAND_FAILURE;
+    }
+
     FILE fh;
     file_t file;
     char resolved_path[512];
@@ -158,9 +167,13 @@ static int parse_input(vector *input, char *buffer[]) {
 
     vtostr(input, str);
 
-    for (i = 0; token != NULL; i++) {
-        token = strtok(i == 0 ? str : NULL, " ");
+    i = 0;
+    token = strtok(str, " ");
+
+    while (token) {
         buffer[i] = token;
+        i++;
+        token = strtok(NULL, " ");
     }
 
     return i;
