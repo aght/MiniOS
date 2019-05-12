@@ -118,10 +118,7 @@ static uint32_t rgb_to_hex(rgb_t color) {
 }
 
 void hal_io_video_clear() {
-    uint32_t *ptr = frame_buffer_ptr;
-
     for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++) {
-        *ptr = 0;
-        ptr++;
+        frame_buffer_ptr[i] = 0;
     }
 }

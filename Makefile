@@ -5,26 +5,29 @@ RM = rmdir /S /Q "$(1)"
 FIND = dir /a-D /S /B "$(1)"
 
 .PHONY: all
-all: kernel app run
+all: clean kernel app run
 
 .PHONY: kernel
 kernel:
+	@echo Compiling $(KERNEL_PROJECT)...
 	+@$(call MAKEDIR,$(KERNEL_OUTDIR))
 	+@$(CC) $(KERNEL_CFLAGS) $(KERNEL_CSOURCE) $(KERNEL_ASMSOURCE) -o $(KERNEL_OUTDIR)\$(KERNEL_PROJECT).elf -T $(KERNEL_LINKERFILE) $(KERNEL_LDFLAGS)
 
 .PHONY: app
 app:
+	@echo Compiling $(APP_PROJECT)...
 	+@$(call MAKEDIR,$(APP_OUTDIR))
-	+@$(CC) $(APP_CFLAGS) $(APP_CSOURCE) $(APP_ASMSOURCE) -o $(APP_OUTDIR)/$(APP_PROJECT).elf -T $(APP_LINKERFILE) $(APP_LDFLAGS)
+	+@$(CC) $(APP_CFLAGS) $(APP_CSOURCE) $(APP_ASMSOURCE) -o $(APP_OUTDIR)\$(APP_PROJECT).elf -T $(APP_LINKERFILE) $(APP_LDFLAGS)
 	+@$(OBJCPY) $(APP_OUTDIR)\$(APP_PROJECT).elf -O binary $(APP_OUTDIR)\$(APP_PROJECT).bin
 
 .PHONY: clean
 clean:
-	+@$(call RM,$(KERNEL_OUTDIR))
-	+@$(call RM,$(APP_OUTDIR))
+	-@$(call RM,$(KERNEL_OUTDIR))
+	-@$(call RM,$(APP_OUTDIR))
 
 .PHONY: run
 run:
+	@echo Running $(KERNEL_PROJECT)...
 	+@$(QEMU) $(QEMUFLAGS)
 
 CC = arm-none-eabi-gcc.exe

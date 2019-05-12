@@ -49,6 +49,7 @@ hal_io_video_init:
 
 _video_init_failed:
 	mov r0, #INIT_FAILED
+    
 _video_init_success:
 	pop {r4-r9, pc}
 

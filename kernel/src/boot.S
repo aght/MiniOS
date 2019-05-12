@@ -81,7 +81,7 @@ vector:
 
 		reset_handler:      .word _bootloader
 		undefined_handler:  .word hang
-		swi_handler:        .word hang
+		swi_handler:        .word svc_handler
 		prefetch_handler:   .word hang
 		data_handler:       .word hang
 		unused_handler:     .word hang
