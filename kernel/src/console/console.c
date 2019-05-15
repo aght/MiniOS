@@ -180,8 +180,15 @@ static int parse_input(vector *input, char *buffer[]) {
     return i;
 }
 
-char *getcwd(char buf[]) {
-    sprintf(buf, cwd);
+char *getcwd(char *buffer, int size) {
+    if (size < strlen(cwd) + 1) {
+        return NULL;
+    } 
+
+    for (int i = 0; cwd[i] != '\0'; i++) {
+        buffer[i] = cwd[i];
+    }
+    
     return cwd;
 }
 

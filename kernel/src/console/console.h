@@ -20,7 +20,7 @@
 void console_init();
 void console_run();
 
-char* getcwd(char buf[]);
+char* getcwd(char *buffer, int size);
 int chdir(const char *dir);
 void console_clear();
 
