@@ -3,5 +3,6 @@
 
 void putc(char c);
 char getc();
+void clear();
 
 #endif

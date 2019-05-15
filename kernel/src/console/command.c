@@ -37,10 +37,24 @@ static int pwd(const char *params[], int n) {
 }
 
 static int cd(const char *params[], int n) {
+    int status;
     if (n == 0) {
-        chdir(NULL);
+        status = chdir(NULL);
     } else {
-        chdir(params[0]);
+        status = chdir(params[0]);
+    }
+
+    if (status == 0) {
+        return COMMAND_SUCCESS;
+    }
+
+    switch (status) {
+        case FILE_ATTRIBUTE_NORMAL:
+            console_println("%s: is a file", params[0]);
+            break;
+        default:
+            console_println("%s: is not a file or directory", params[0]);
+            break;
     }
 
     return COMMAND_SUCCESS;

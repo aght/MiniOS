@@ -185,7 +185,7 @@ char *getcwd(char buf[]) {
     return cwd;
 }
 
-void chdir(const char *dir) {
+int chdir(const char *dir) {
     char concat_dir[512];
     char resolved_path[512];
 
@@ -199,15 +199,11 @@ void chdir(const char *dir) {
 
     int file_type = realpath_n(concat_dir, resolved_path);
 
-    switch (file_type) {
-        case FILE_ATTRIBUTE_DIRECTORY:
-            sprintf(cwd, resolved_path);
-            break;
-        case FILE_ATTRIBUTE_NORMAL:
-            console_println("%s: is a file", dir);
-            break;
-        default:
-            console_println("%s: is not a file or directory", dir);
+    if (file_type == FILE_ATTRIBUTE_DIRECTORY) {
+        sprintf(cwd, resolved_path);
+        return 0;
+    } else {
+        return file_type;
     }
 }
 
