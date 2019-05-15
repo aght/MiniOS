@@ -22,6 +22,8 @@ void *c_svc_handler(int svc_number, void *r1, void *r2, void *r3, void *r4) {
             return hal_io_serial_getc();
         case 2:
             console_clear();
+        case 3:
+            return getcwd(r1, r2);
         default:
             break;
     }
