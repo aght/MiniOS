@@ -128,7 +128,8 @@ static int run_command(char *tokens[], int n) {
     return cmd->action(n > 1 ? &tokens[1] : NULL, n - 1);
 }
 
-static int run_program(char *tokens[], int n) {
+// no optimization for now to allow the program to run
+static int __attribute__((optimize("O0"))) run_program(char *tokens[], int n) {
     if (n == 0) {
         return COMMAND_FAILURE;
     }
@@ -282,7 +283,7 @@ static int vconsole_print(const char *fmt, va_list args) {
         if (printf_buf[i] != '\n') {
             vector_add(&printed_buffer, printf_buf[i]);
 
-            if (printed_lines.size > 1.5 * SCREEN_MAX_LINES) {
+            if (printed_lines.size > SCREEN_MAX_LINES) {
                 redraw();
             }
 

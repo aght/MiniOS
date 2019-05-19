@@ -1,6 +1,9 @@
 #ifndef _COMMAND_
 #define _COMMAND_
 
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+
 #include "command.h"
 
 static int pwd(const char *params[], int n);
@@ -211,4 +214,5 @@ static int clear(const char *params[], int n) {
     return COMMAND_CLEAR;
 }
 
+#pragma GCC pop_options
 #endif

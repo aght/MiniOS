@@ -7,7 +7,8 @@
 #include "../stdio/emb-stdio.h"							// Provides printf functionality
 #include "SDCard.h"								// This units header
 
-
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
 
 //======================================================================
 // I harcoded this. SmartStart.S tried to get this dynamically, but
@@ -2507,3 +2508,5 @@ struct CSD* sdCardCSD (void) {
 	if (sdCard.type != SD_TYPE_UNKNOWN) return (&sdCard.csd);		// Card success so return structure pointer
 		else return NULL;											// Return fail result of null
 }
+
+#pragma GCC pop_options

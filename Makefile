@@ -48,7 +48,7 @@ APP_OUTDIR = app\build
 KERNEL_OUTDIR = kernel\build
 
 KERNEL_CFLAGS += -w 
-KERNEL_CFLAGS += -O0 
+KERNEL_CFLAGS += -O4
 KERNEL_CFLAGS += -mfpu=neon-vfpv4 
 KERNEL_CFLAGS += -march=armv7-a 
 KERNEL_CFLAGS += -mcpu=cortex-a7 

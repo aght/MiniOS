@@ -1,5 +1,9 @@
 #ifndef SDCARD_H
 #define SDCARD_H
+
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+
 #include <time.h>														// C standard for time needed for that and struct tm
 #include "../smartstart/rpi-smartstart.h"		// Provides all basic hardware access and printhandler definition and HANDLE type
 
@@ -306,5 +310,7 @@ uint32_t sdSetFilePointer (HANDLE hFile,							// Handle as returned from Create
 . 23Feb17 LdB
 .--------------------------------------------------------------------------*/
 uint32_t sdGetFileSize (HANDLE  hFile, uint32_t* lpFileSizeHigh);
+
+#pragma GCC pop_options
 
 #endif // SDCARD_H
