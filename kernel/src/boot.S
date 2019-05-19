@@ -48,6 +48,23 @@ _bootloader:
     orr r0, #SCTLR_ENABLE_DATA_CACHE							@ Data cache on
     orr r0, #SCTLR_ENABLE_INSTRUCTION_CACHE				@ Instruction cache on
 
+
+		// http://www.valvers.com/open-software/raspberry-pi/step05-bare-metal-programming-in-c-pt5/
+		// r1 = Access Control Register
+    mrc p15, #0, r1, c1, c0, #2
+    // enable full access for p10,11
+    orr r1, r1, #(0xf << 20)
+    // ccess Control Register = r1
+    mcr p15, #0, r1, c1, c0, #2
+    mov r1, #0
+    // flush prefetch buffer because of FMXR below
+    mcr p15, #0, r1, c7, c5, #4
+    // and CP 10 & 11 were only just enabled
+    // Enable VFP itself
+    mov r0,#0x40000000
+    // FPEXC = r0
+    fmxr fpexc, r0
+
     mcr p15,0,r0,c1,c0,0													@ System Control Register = R0
 
 		ldr r4, =__bss_start__			/* Fill BSS with Zeroes */

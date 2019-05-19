@@ -233,7 +233,7 @@ static void redraw() {
 
     for (int i = 0; i < printed_lines.size; i++) {
         char *line = vector_get(&printed_lines, i);
-        sconsole_print(line);
+         i == printed_lines.size - 1 ? sconsole_println(line) : sconsole_println(line);
     }
 
     vector_clear(&printed_buffer);
@@ -280,9 +280,10 @@ static int vconsole_print(const char *fmt, va_list args) {
     printed = vsprintf(printf_buf, fmt, args);
 
     for (int i = 0; i < printed; i++) {
-        vector_add(&printed_buffer, printf_buf[i]);
 
         if (printf_buf[i] != '\n') {
+            vector_add(&printed_buffer, printf_buf[i]);
+
             if (printed_lines.size > 2 * SCREEN_MAX_LINES) {
                 redraw();
             }
