@@ -89,7 +89,9 @@ void hal_io_video_putc(uint8_t c) {
                     if ((bits & 0x80000000) != 0) {
                         hal_io_video_put_pixel(cursorX + xoffs, y, brush_color);
                     } else {
-                        hal_io_video_put_pixel(cursorX + xoffs, y, fill_color);
+                        if (c == ' ') {
+                            hal_io_video_put_pixel(cursorX + xoffs, y, fill_color);
+                        }
                     }
 
                     bits <<= 1;

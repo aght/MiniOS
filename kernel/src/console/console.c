@@ -88,7 +88,6 @@ void console_run() {
     }
 }
 
-// Broken, cannot use cat n two or more times
 static int execute_input(vector *buffer) {
     int n;
     int status;
@@ -283,7 +282,7 @@ static int vconsole_print(const char *fmt, va_list args) {
         if (printf_buf[i] != '\n') {
             vector_add(&printed_buffer, printf_buf[i]);
 
-            if (printed_lines.size > 2 * SCREEN_MAX_LINES) {
+            if (printed_lines.size > 1.5 * SCREEN_MAX_LINES) {
                 redraw();
             }
 
