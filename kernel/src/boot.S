@@ -2,6 +2,10 @@
 .globl _bootloader
 .align 2
 
+.equ SCTLR_ENABLE_DATA_CACHE,			0x4
+.equ SCTLR_ENABLE_BRANCH_PREDICTION,	0x800
+.equ SCTLR_ENABLE_INSTRUCTION_CACHE,	0x1000
+
 _bootloader:
 	@ in QEMU all of 4 ARM CPUs are started simultaniously         /* From                                                      */
 	                                                               /* https://github.com/mmuszkow/NoOsBootstrap/tree/master/arm */
@@ -28,7 +32,6 @@ _bootloader:
 															 See here (page 10):
 															 	  ftp://ftp.intel.com/Pub/fpgaup/pub/Intel_Material/16.1/Tutorials/Using_GIC.pdf
 														*/
-
 		// set sp in svc mode.
 		//(I think svc is supervisor mode)
 		//See here:
@@ -36,6 +39,16 @@ _bootloader:
 		msr cpsr_c, r0
 		ldr r4, =__stack_end 			/* Set up SP */
 		mov sp, r4
+
+		// https://github.com/LdB-ECM/Raspberry-Pi/blob/master/GLES2/SmartStart32.S
+    mrc p15,0,r0,c1,c0,0													@ R0 = System Control Register
+
+    /* Enable caches and branch prediction */
+    orr r0, #SCTLR_ENABLE_BRANCH_PREDICTION				@ Branch prediction on
+    orr r0, #SCTLR_ENABLE_DATA_CACHE							@ Data cache on
+    orr r0, #SCTLR_ENABLE_INSTRUCTION_CACHE				@ Instruction cache on
+
+    mcr p15,0,r0,c1,c0,0													@ System Control Register = R0
 
 		ldr r4, =__bss_start__			/* Fill BSS with Zeroes */
 		ldr r9, =__bss_end__

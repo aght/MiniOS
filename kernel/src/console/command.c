@@ -1,6 +1,9 @@
 #ifndef _COMMAND_
 #define _COMMAND_
 
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+
 #include "command.h"
 
 static int pwd(const char *params[], int n);
@@ -30,17 +33,31 @@ command_t *find_command(const char *str) {
 
 static int pwd(const char *params[], int n) {
     char cwd[512];
-    getcwd(cwd);
+    getcwd(cwd, 512);
     console_println(cwd);
 
     return COMMAND_SUCCESS;
 }
 
 static int cd(const char *params[], int n) {
+    int status;
     if (n == 0) {
-        chdir(NULL);
+        status = chdir(NULL);
     } else {
-        chdir(params[0]);
+        status = chdir(params[0]);
+    }
+
+    if (status == 0) {
+        return COMMAND_SUCCESS;
+    }
+
+    switch (status) {
+        case FILE_ATTRIBUTE_NORMAL:
+            console_println("%s: is a file", params[0]);
+            break;
+        default:
+            console_println("%s: is not a file or directory", params[0]);
+            break;
     }
 
     return COMMAND_SUCCESS;
@@ -51,7 +68,7 @@ static int ls(const char *params[], int n) {
     char path[512];
     int file_type;
 
-    file_type = trpath(n != 0 ? params[0] : NULL, getcwd(cwd), "*.*", path);
+    file_type = trpath(n != 0 ? params[0] : NULL, getcwd(cwd, 512), "*.*", path);
 
     switch (file_type) {
         case FILE_ATTRIBUTE_NORMAL:
@@ -93,7 +110,7 @@ static int cat(const char *params[], int n) {
         return COMMAND_FAILURE;
     }
 
-    file_type = trpath(n != 0 ? params[0] : NULL, getcwd(cwd), NULL, path);
+    file_type = trpath(n != 0 ? params[0] : NULL, getcwd(cwd, 512), NULL, path);
 
     switch (file_type) {
         case FILE_ATTRIBUTE_DIRECTORY:
@@ -133,7 +150,7 @@ static int hexdump(const char *params[], int n) {
         return COMMAND_FAILURE;
     }
 
-    file_type = trpath(n != 0 ? params[0] : NULL, getcwd(cwd), NULL, path);
+    file_type = trpath(n != 0 ? params[0] : NULL, getcwd(cwd, 512), NULL, path);
 
     switch (file_type) {
         case FILE_ATTRIBUTE_DIRECTORY:
@@ -197,4 +214,5 @@ static int clear(const char *params[], int n) {
     return COMMAND_CLEAR;
 }
 
+#pragma GCC pop_options
 #endif

@@ -88,7 +88,6 @@ void console_run() {
     }
 }
 
-// Broken, cannot use cat n two or more times
 static int execute_input(vector *buffer) {
     int n;
     int status;
@@ -129,7 +128,8 @@ static int run_command(char *tokens[], int n) {
     return cmd->action(n > 1 ? &tokens[1] : NULL, n - 1);
 }
 
-static int run_program(char *tokens[], int n) {
+// no optimization for now to allow the program to run
+static int __attribute__((optimize("O0"))) run_program(char *tokens[], int n) {
     if (n == 0) {
         return COMMAND_FAILURE;
     }
@@ -180,12 +180,19 @@ static int parse_input(vector *input, char *buffer[]) {
     return i;
 }
 
-char *getcwd(char buf[]) {
-    sprintf(buf, cwd);
+char *getcwd(char *buffer, int size) {
+    if (size < strlen(cwd) + 1) {
+        return NULL;
+    } 
+
+    for (int i = 0; cwd[i] != '\0'; i++) {
+        buffer[i] = cwd[i];
+    }
+    
     return cwd;
 }
 
-void chdir(const char *dir) {
+int chdir(const char *dir) {
     char concat_dir[512];
     char resolved_path[512];
 
@@ -199,15 +206,11 @@ void chdir(const char *dir) {
 
     int file_type = realpath_n(concat_dir, resolved_path);
 
-    switch (file_type) {
-        case FILE_ATTRIBUTE_DIRECTORY:
-            sprintf(cwd, resolved_path);
-            break;
-        case FILE_ATTRIBUTE_NORMAL:
-            console_println("%s: is a file", dir);
-            break;
-        default:
-            console_println("%s: is not a file or directory", dir);
+    if (file_type == FILE_ATTRIBUTE_DIRECTORY) {
+        sprintf(cwd, resolved_path);
+        return 0;
+    } else {
+        return file_type;
     }
 }
 
@@ -280,7 +283,7 @@ static int vconsole_print(const char *fmt, va_list args) {
         if (printf_buf[i] != '\n') {
             vector_add(&printed_buffer, printf_buf[i]);
 
-            if (printed_lines.size > 2 * SCREEN_MAX_LINES) {
+            if (printed_lines.size > SCREEN_MAX_LINES) {
                 redraw();
             }
 
