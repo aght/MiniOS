@@ -19,7 +19,7 @@ void rpi_video_init(int w, int h, int d) {
     rpi_property_add_tag(TAG_ALLOCATE_BUFFER);
     rpi_property_add_tag(TAG_SET_PHYSICAL_SIZE, w, h);
     rpi_property_add_tag(TAG_SET_VIRTUAL_SIZE, w, h * 2);
-    rpi_property_add_tag(TAG_SET_VIRTUAL_OFFSET, 0, virtual_offset);
+    rpi_property_add_tag(TAG_SET_VIRTUAL_OFFSET, 0, 0);
     rpi_property_add_tag(TAG_SET_DEPTH, d);
     rpi_property_add_tag(TAG_GET_VIRTUAL_OFFSET);
     rpi_property_add_tag(TAG_GET_PITCH);
@@ -98,7 +98,7 @@ void rpi_video_swap_buffer() {
 }
 
 void rpi_video_fill(rgb_t color) {
-    for (uint_fast32_t y = virtual_offset; y < height; y++) {
+    for (uint_fast32_t y = 0; y < height; y++) {
         for (uint_fast32_t x = 0; x < width; x++) {
             rpi_video_put_pixel(x, y, color);
         }
@@ -106,7 +106,7 @@ void rpi_video_fill(rgb_t color) {
 }
 
 void rpi_video_clear() {
-    memset(frame_buffer, 0, (width * (depth >> 3)) + ((height + virtual_offset) * pitch));
+    memset(frame_buffer, 0, (width * (depth >> 3)) + (height * pitch));
 }
 
 #endif
