@@ -5,17 +5,13 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "../rpi/video/rpi_video.h"
+
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 
 #define FONT_HEIGHT 16
 #define FONT_WIDTH 8
-
-typedef struct {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-} rgb_t;
 
 uint32_t hal_io_get_cursor_x();
 uint32_t hal_io_get_cursor_y();

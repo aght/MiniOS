@@ -7,14 +7,13 @@
 #include "console/console.h"
 #include "drivers/sdcard/SDCard.h"
 #include "drivers/stdio/emb-stdio.h"
-#include "hal/hal.h"
+#include "rpi/video/rpi_video.h"
 
 void main(void) {
-    hal_io_video_init();
+    rpi_video_init(640, 480, 24);
     hal_io_serial_init();
     ARM_setmaxspeed(NULL);
     sdInitCard(NULL, NULL, true);
     console_init();
-
     console_run();
 }

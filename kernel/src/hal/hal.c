@@ -1,7 +1,7 @@
 #include <stdint.h>
 
 #include "../font/font.h"
-#include "../uart/uart.h"
+#include "../rpi/uart/rpi_uart.h"
 #include "hal.h"
 
 static uint_fast32_t x_y_to_raw(uint_fast32_t, uint_fast32_t);
@@ -11,8 +11,6 @@ static uint32_t cursorX = 0;
 static uint32_t cursorY = 0;
 static rgb_t brush_color = {255, 255, 255};
 static rgb_t fill_color = {0, 0, 0};
-
-uint32_t *frame_buffer_ptr;
 
 uint32_t hal_io_get_cursor_x() {
     return cursorX;
@@ -107,7 +105,7 @@ void hal_io_video_putc(uint8_t c) {
 }
 
 void hal_io_video_put_pixel(uint_fast32_t x, uint_fast32_t y, rgb_t color) {
-    hal_io_video_put_pixel_raw(x_y_to_raw(x, y), rgb_to_hex(color));
+    rpi_video_put_pixel(x, y, color);
 }
 
 static uint_fast32_t x_y_to_raw(uint_fast32_t x, uint_fast32_t y) {
@@ -120,7 +118,5 @@ static uint32_t rgb_to_hex(rgb_t color) {
 }
 
 void hal_io_video_clear() {
-    for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++) {
-        frame_buffer_ptr[i] = 0;
-    }
+    rpi_video_clear();
 }

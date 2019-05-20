@@ -1,7 +1,7 @@
 #ifndef _UART_
 #define _UART_
 
-#include "uart.h"
+#include "rpi_uart.h"
 
 static void str(uint32_t, uint32_t);
 static uint32_t ldr(uint32_t);
