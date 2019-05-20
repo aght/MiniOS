@@ -3,18 +3,25 @@
 
 #include "rpi_video.h"
 
+// temp
+#include "../../drivers/stdio/emb-stdio.h"
+
 static volatile unsigned char *frame_buffer = NULL;
 static volatile int width = 0;
 static volatile int height = 0;
 static volatile int depth = 0;
 static volatile int pitch = 0;
 
+static volatile int virtual_offset = 0;
+
 void rpi_video_init(int w, int h, int d) {
     rpi_property_init();
     rpi_property_add_tag(TAG_ALLOCATE_BUFFER);
     rpi_property_add_tag(TAG_SET_PHYSICAL_SIZE, w, h);
     rpi_property_add_tag(TAG_SET_VIRTUAL_SIZE, w, h * 2);
+    rpi_property_add_tag(TAG_SET_VIRTUAL_OFFSET, 0, virtual_offset);
     rpi_property_add_tag(TAG_SET_DEPTH, d);
+    rpi_property_add_tag(TAG_GET_VIRTUAL_OFFSET);
     rpi_property_add_tag(TAG_GET_PITCH);
     rpi_property_add_tag(TAG_GET_PHYSICAL_SIZE);
     rpi_property_add_tag(TAG_GET_DEPTH);
@@ -76,8 +83,22 @@ void rpi_video_put_pixel(int x, int y, rgb_t color) {
     }
 }
 
+void rpi_video_swap_buffer() {
+    virtual_offset = virtual_offset == 0 ? height : 0;
+
+    rpi_property_init();
+    rpi_property_add_tag(TAG_SET_VIRTUAL_OFFSET, 0, virtual_offset);
+    rpi_property_add_tag(TAG_GET_VIRTUAL_OFFSET);
+    rpi_property_process();
+
+    rpi_mailbox_property_t *mp;
+    if ((mp = rpi_property_get(TAG_GET_VIRTUAL_OFFSET))) {
+        printf("Offset: %d, %d\n", mp->data.buffer_32[0], mp->data.buffer_32[1]);
+    }
+}
+
 void rpi_video_fill(rgb_t color) {
-    for (uint_fast32_t y = 0; y < height; y++) {
+    for (uint_fast32_t y = virtual_offset; y < height; y++) {
         for (uint_fast32_t x = 0; x < width; x++) {
             rpi_video_put_pixel(x, y, color);
         }
@@ -85,9 +106,7 @@ void rpi_video_fill(rgb_t color) {
 }
 
 void rpi_video_clear() {
-    int max = (width * (depth >> 3)) + (height * pitch);
-
-    memset(frame_buffer, 0, max);
+    memset(frame_buffer, 0, (width * (depth >> 3)) + ((height + virtual_offset) * pitch));
 }
 
 #endif
