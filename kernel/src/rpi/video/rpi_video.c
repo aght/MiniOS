@@ -84,10 +84,7 @@ void rpi_video_put_pixel(int x, int y, rgb_t color) {
 }
 
 void rpi_video_swap_buffer() {
-    virtual_offset = virtual_offset == 0 ? height : 0;
-
     rpi_property_init();
-    rpi_property_add_tag(TAG_SET_VIRTUAL_OFFSET, 0, virtual_offset);
     rpi_property_add_tag(TAG_GET_VIRTUAL_OFFSET);
     rpi_property_process();
 
@@ -95,6 +92,12 @@ void rpi_video_swap_buffer() {
     if ((mp = rpi_property_get(TAG_GET_VIRTUAL_OFFSET))) {
         printf("Offset: %d, %d\n", mp->data.buffer_32[0], mp->data.buffer_32[1]);
     }
+
+    virtual_offset = virtual_offset == 0 ? height : 0;
+
+    rpi_property_init();
+    rpi_property_add_tag(TAG_SET_VIRTUAL_OFFSET, 0, virtual_offset);
+    rpi_property_process();
 }
 
 void rpi_video_fill(rgb_t color) {

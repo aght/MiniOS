@@ -24,7 +24,7 @@ void main(void) {
 
     while (1) {
         rpi_video_swap_buffer();
-        for (long long i = 0; i < 100000000; i++)
+        for (long long i = 0; i < 90000000; i++)
             ;
     }
 }
