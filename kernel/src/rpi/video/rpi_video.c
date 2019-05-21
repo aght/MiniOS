@@ -3,7 +3,6 @@
 
 #include "rpi_video.h"
 
-// temp
 #include "../../drivers/stdio/emb-stdio.h"
 
 static volatile uint8_t *frame_buffer = NULL;

@@ -10,6 +10,7 @@ putc:
 .globl getc
 getc:
     push {lr}
+    
     svc #1
     pop {pc}
 

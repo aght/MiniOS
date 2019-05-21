@@ -7,13 +7,6 @@
 #include "console/console.h"
 #include "rpi/video/rpi_video.h"
 
-static void delay(uint32_t count) {
-    asm volatile("__delay_%=: subs %[count], %[count], #1; bne __delay_%=\n"
-                 : "=r"(count)
-                 : [count] "0"(count)
-                 : "cc");
-}
-
 void main(void) {
     rpi_video_init(640, 480, 24);
     hal_io_serial_init();
@@ -57,16 +50,7 @@ void main(void) {
             ydir *= -1;
         }
 
-        // if (flip) {
-        //     rpi_video_rect(x++, y++, w, h, red);
-        // } else {
-        //     rpi_video_rect(x++, y++, w, h, green);
-        // }
-
-        // flip = !flip;
         rpi_video_swap_buffer();
         rpi_video_clear();
-
-        // delay(5000000);
     }
 }
