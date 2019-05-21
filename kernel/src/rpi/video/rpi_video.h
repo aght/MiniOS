@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "../mailbox/rpi_mailbox.h"
 #include "../mailbox/rpi_mailbox_interface.h"
