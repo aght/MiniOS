@@ -23,6 +23,7 @@ int rpi_video_pitch();
 void rpi_video_put_pixel(int x, int y, rgb_t color);
 void rpi_video_swap_buffer();
 void rpi_video_fill(rgb_t color);
+void rpi_video_rect(int x, int y, int w, int h, rgb_t color);
 void rpi_video_clear();
 
 
