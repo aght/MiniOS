@@ -1,11 +1,11 @@
 .section ".boot"
+
+.equ SCTLR_ENABLE_DATA_CACHE,	0x4
+.equ SCTLR_ENABLE_BRANCH_PREDICTION, 0x800
+.equ SCTLR_ENABLE_INSTRUCTION_CACHE, 0x1000
+
 .globl _bootloader
 .align 2
-
-.equ SCTLR_ENABLE_DATA_CACHE,			0x4
-.equ SCTLR_ENABLE_BRANCH_PREDICTION,	0x800
-.equ SCTLR_ENABLE_INSTRUCTION_CACHE,	0x1000
-
 _bootloader:
 	@ in QEMU all of 4 ARM CPUs are started simultaniously         /* From                                                      */
 	                                                               /* https://github.com/mmuszkow/NoOsBootstrap/tree/master/arm */
@@ -27,11 +27,8 @@ _bootloader:
 		bic r1, r0, #0x1F
 		orr r1, r1, #0x12
 		msr cpsr_c,r1
-		mov sp, #0x4000					/* I think somehow, this will
-				 											 give diff Stacks to IRQs and he Kernel
-															 See here (page 10):
-															 	  ftp://ftp.intel.com/Pub/fpgaup/pub/Intel_Material/16.1/Tutorials/Using_GIC.pdf
-														*/
+		mov sp, #0x4000	
+
 		// set sp in svc mode.
 		//(I think svc is supervisor mode)
 		//See here:
@@ -41,7 +38,7 @@ _bootloader:
 		mov sp, r4
 
 		// https://github.com/LdB-ECM/Raspberry-Pi/blob/master/GLES2/SmartStart32.S
-    mrc p15,0,r0,c1,c0,0													@ R0 = System Control Register
+    mrc p15, 0, r0, c1, c0, 0										  @ R0 = System Control Register
     orr r0, #SCTLR_ENABLE_BRANCH_PREDICTION				@ Branch prediction on
     orr r0, #SCTLR_ENABLE_DATA_CACHE							@ Data cache on
     orr r0, #SCTLR_ENABLE_INSTRUCTION_CACHE				@ Instruction cache on

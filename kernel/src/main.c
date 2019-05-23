@@ -16,23 +16,23 @@ typedef struct {
     int ydir;
 } rect;
 
-void update_rect(rect* rect) {
+static void delay(uint32_t count)
+{
+    asm volatile("__delay_%=: subs %[count], %[count], #1; bne __delay_%=\n"
+                 : "=r"(count)
+                 : [count] "0"(count)
+                 : "cc");
+}
+
+static void update_rect(rect* rect) {
     rect->x += rect->xdir;
     rect->y += rect->ydir;
 
-    if (rect->x <= 0) {
+    if (rect->x <= 0 || rect->x + rect->w >= 640) {
         rect->xdir *= -1;
     }
 
-    if (rect->x + rect->w >= 640) {
-        rect->xdir *= -1;
-    }
-
-    if (rect->y <= 0) {
-        rect->ydir *= -1;
-    }
-
-    if (rect->y + rect->h >= 480) {
+    if (rect->y <= 0 || rect->y + rect->h >= 480) {
         rect->ydir *= -1;
     }
 }
@@ -45,14 +45,14 @@ void main(void) {
     // console_init();
     // console_run();
 
-    int xdir = 1;
-    int ydir = 1;
-
-    rect rect1 = {0, 0, 230, 100, 1, 1};
-    rect rect2 = {50, 100, 50, 60, -1, 1};
+    rect rect1 = {0, 0, 230, 100, 5, 5};
+    rect rect2 = {50, 100, 50, 60, -5, 5};
 
     rgb_t red = {255, 0, 0};
     rgb_t green = {0, 255, 0};
+
+    const int fps = 100;
+    const uint32_t delay_time = 700000000 / fps;
 
     while (1) {
         rpi_video_rect(rect1.x, rect1.y, rect1.w, rect1.h, green);
@@ -63,5 +63,7 @@ void main(void) {
 
         rpi_video_swap_buffer();
         rpi_video_clear();
+
+        delay(delay_time);
     }
 }

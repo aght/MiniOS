@@ -26,5 +26,8 @@ void rpi_video_fill(rgb_t color);
 void rpi_video_rect(int x, int y, int w, int h, rgb_t color);
 void rpi_video_clear();
 
+// temp
+void rpi_video_clearf();
+
 
 #endif

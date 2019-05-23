@@ -105,4 +105,8 @@ void rpi_video_clear() {
     memset(&frame_buffer[(0 * (depth >> 3)) + (virtual_offset * pitch)], 0, (0 * (depth >> 3)) + (virtual_offset * pitch) * sizeof(uint8_t));
 }
 
+void rpi_video_clearf() {
+    memset(frame_buffer, 0, (width * (depth >> 3)) + (height * pitch) * sizeof(uint8_t));
+}
+
 #endif

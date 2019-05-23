@@ -118,5 +118,5 @@ static uint32_t rgb_to_hex(rgb_t color) {
 }
 
 void hal_io_video_clear() {
-    rpi_video_clear();
+   rpi_video_clearf();
 }

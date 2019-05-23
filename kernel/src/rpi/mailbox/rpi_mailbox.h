@@ -3,7 +3,8 @@
 #ifndef _RPI_MAILBOX_H_
 #define _RPI_MAILBOX_H_
 
-#define RPI_PERIPHERAL_BASE 0x3F000000UL
+#include "../rpi_base.h"
+
 #define RPI_MAILBOX0_BASE (RPI_PERIPHERAL_BASE + 0xB880)
 
 typedef enum {
