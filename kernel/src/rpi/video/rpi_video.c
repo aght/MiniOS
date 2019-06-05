@@ -87,10 +87,10 @@ void rpi_video_swap_buffer() {
 }
 
 void rpi_video_rect(int x, int y, int w, int h, rgb_t color) {
-    const uint_fast32_t ymax = y + h + virtual_offset;
+    const uint_fast32_t ymax = y + h;
     const uint_fast32_t xmax = x + w;
     
-    for (uint_fast32_t _y = y + virtual_offset; _y < ymax; _y++) {
+    for (uint_fast32_t _y = y; _y < ymax; _y++) {
         for (uint_fast32_t _x = x; _x < xmax; _x++) {
             rpi_video_put_pixel(_x, _y, color);
         }
@@ -102,7 +102,7 @@ void rpi_video_fill(rgb_t color) {
 }
 
 void rpi_video_clear() {
-    memset(&frame_buffer[(0 * (depth >> 3)) + (virtual_offset * pitch)], 0, (0 * (depth >> 3)) + (virtual_offset * pitch) * sizeof(uint8_t));
+    memset(&frame_buffer[(0 * (depth >> 3)) + (0 * pitch)], 0, (0 * (depth >> 3)) + (height * pitch) * sizeof(uint8_t));
 }
 
 void rpi_video_clearf() {
